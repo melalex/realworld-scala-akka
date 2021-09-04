@@ -46,14 +46,14 @@ class UserServiceImpl[F[_]: Monad, DB[_]: Monad](
     val unitOfWork = OptionT(userRepository.findById(id))
       .map(user => userFactory.createUpdatedUser(user, updateUser))
       .map(userRepository.save)
-      .toRight(RealWorldError.notFound(id).ex[NotFoundException])
+      .toRight(RealWorldError.NotFound(id).ex[NotFoundException])
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
   }
 
   def getUserById(id: ModelId): F[Either[NotFoundException, SavedUser]] = {
     val unitOfWork = OptionT(userRepository.findById(id))
-      .toRight(RealWorldError.notFound(id).ex[NotFoundException])
+      .toRight(RealWorldError.NotFound(id).ex[NotFoundException])
 
     dbInterpreter.execute(unitOfWork.value)
   }

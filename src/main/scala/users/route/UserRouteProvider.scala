@@ -1,7 +1,7 @@
 package com.melalex.realworld
 package users.route
 
-import commons.auth.directives.RealWorldSecurityDirectives
+import commons.auth.web.RealWorldSecurityDirectives
 import commons.auth.service.TokenService
 import commons.web.{RealWorldDirectives, RouteProvider}
 import users.dto.{UserAuthenticationDto, UserRegistrationDto, UserUpdateDto}
@@ -12,6 +12,7 @@ import akka.http.scaladsl.server.directives.FutureDirectives
 import akka.http.scaladsl.server.{Directives, Route}
 import cats.data._
 import cats.implicits._
+import com.melalex.realworld.commons.validation.web.ValidationDirectives
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
 
@@ -26,7 +27,8 @@ class UserRouteProvider(
     with Directives
     with FutureDirectives
     with RealWorldDirectives
-    with RealWorldSecurityDirectives {
+    with RealWorldSecurityDirectives
+    with ValidationDirectives {
 
   override def provideRoute: Route = pathPrefix("/users") {
     post {

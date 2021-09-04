@@ -2,7 +2,7 @@ package com.melalex.realworld
 package users.model
 
 import commons.auth.model.{ActualUserPrincipal, SecurityToken}
-import commons.model.ModelId
+import commons.model.{FieldName, ModelId}
 
 import java.time.Instant
 
@@ -39,6 +39,15 @@ case class UnSavedUser(
 ) extends User
 
 object User {
+
+  val Id: FieldName[User]        = FieldName[User]("id")
+  val Email: FieldName[User]     = FieldName[User]("email")
+  val Username: FieldName[User]  = FieldName[User]("username")
+  val Password: FieldName[User]  = FieldName[User]("password")
+  val Bio: FieldName[User]       = FieldName[User]("bio")
+  val Image: FieldName[User]     = FieldName[User]("image")
+  val CreatedAt: FieldName[User] = FieldName[User]("createdAt")
+  val UpdatedAt: FieldName[User] = FieldName[User]("updatedAt")
 
   implicit class SavedUserOps(val value: SavedUser) extends AnyVal {
 

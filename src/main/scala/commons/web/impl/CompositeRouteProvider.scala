@@ -4,7 +4,7 @@ package commons.web.impl
 import commons.errors.mappers.RealWorldErrorConversions
 import commons.errors.model.RealWorldError
 import commons.errors.{ClientException, NotFoundException, SecurityException, ServerException}
-import commons.i18n.route.I18nDirectives
+import commons.i18n.web.I18nDirectives
 import commons.web.RouteProvider
 import config.RealWorldProperties
 

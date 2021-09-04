@@ -1,5 +1,5 @@
 package com.melalex.realworld
-package commons.i18n.route
+package commons.i18n.web
 
 import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives.selectPreferredLanguage

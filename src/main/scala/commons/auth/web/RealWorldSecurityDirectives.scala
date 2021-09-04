@@ -1,5 +1,5 @@
 package com.melalex.realworld
-package commons.auth.directives
+package commons.auth.web
 
 import commons.auth.model.{SecurityToken, UserPrincipalWithToken}
 import commons.auth.service.TokenService
