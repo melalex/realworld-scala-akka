@@ -6,8 +6,6 @@ import commons.auth.service.TokenService
 
 import akka.http.scaladsl.server.{Directive1, Directives}
 
-import scala.util.{Failure, Success}
-
 trait RealWorldSecurityDirectives { self: Directives =>
 
   def authenticated(tokenService: TokenService): Directive1[UserPrincipalWithToken] =
@@ -16,8 +14,8 @@ trait RealWorldSecurityDirectives { self: Directives =>
       .map(SecurityToken)
       .map(tokenService.validateToken)
       .flatMap {
-        case Success(value)     => provide(value)
-        case Failure(exception) => failWith(exception)
+        case Right(value)    => provide(value)
+        case Left(exception) => failWith(exception)
       }
 }
 

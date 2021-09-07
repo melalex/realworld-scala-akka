@@ -3,14 +3,14 @@ package commons.validation
 
 import commons.errors.model.RealWorldError
 import commons.errors.model.RealWorldError.{AboveMax, BelowMin, EmptyField, RegExMismatch}
-import commons.validation.FieldValidation.{AlphaNumericRegEx, EmailRegEx}
+import commons.validation.RealWorldValidation.{AlphaNumericRegEx, EmailRegEx}
 
 import cats.data._
 import cats.implicits._
 
 import scala.util.matching.Regex
 
-trait FieldValidation {
+trait RealWorldValidation {
 
   type ValidationResult[A] = ValidatedNec[RealWorldError, A]
   type FieldValidation[F]  = (String, F) => Option[RealWorldError]
@@ -24,6 +24,7 @@ trait FieldValidation {
   implicit val requiredString: Required[String]  = _.nonEmpty
   implicit val minimumStringLength: Min[String]  = _.length >= _
   implicit val maximumStringLength: Max[String]  = _.length <= _
+  implicit val maximumOptionStringLength: Max[Option[String]]  = (opt, limit) => opt.forall(_.length <= limit)
   implicit val stringMatchesRegEx: RegEx[String] = (str, regex) => (regex findFirstIn str).isDefined
 
   def required[F](implicit req: Required[F]): FieldValidation[F] = (fieldName, field) => fieldValidation(req(field))(EmptyField(fieldName))
@@ -56,10 +57,10 @@ trait FieldValidation {
   private def fieldValidation[F](isValid: Boolean)(error: => RealWorldError): Option[RealWorldError] = Option.when(!isValid)(error)
 }
 
-object FieldValidation extends FieldValidation {
+object RealWorldValidation extends RealWorldValidation {
 
   private val EmailRegEx =
-    """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
+    """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
 
   private val AlphaNumericRegEx = """^[a-zA-Z0-9_]*$""".r
 }

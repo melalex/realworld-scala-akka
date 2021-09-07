@@ -1,8 +1,8 @@
 package com.melalex.realworld
 package commons.validation.web
 
-import commons.errors.ClientException
-import commons.validation.FieldValidation.FormValidation
+import commons.errors.model.ClientException
+import commons.validation.RealWorldValidation.FormValidation
 import users.dto.UserRegistrationDto.validateForm
 
 import akka.http.scaladsl.model.HttpRequest

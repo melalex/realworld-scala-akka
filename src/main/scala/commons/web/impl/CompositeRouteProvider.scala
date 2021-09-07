@@ -2,8 +2,7 @@ package com.melalex.realworld
 package commons.web.impl
 
 import commons.errors.mappers.RealWorldErrorConversions
-import commons.errors.model.RealWorldError
-import commons.errors.{ClientException, NotFoundException, SecurityException, ServerException}
+import commons.errors.model._
 import commons.i18n.web.I18nDirectives
 import commons.web.RouteProvider
 import config.RealWorldProperties
@@ -19,8 +18,7 @@ class CompositeRouteProvider(
     delegates: Set[RouteProvider],
     errorConversions: RealWorldErrorConversions,
     realWorldProperties: RealWorldProperties
-) extends RouteProvider
-    with I18nDirectives
+) extends I18nDirectives
     with FailFastCirceSupport
     with Directives {
 
@@ -34,10 +32,10 @@ class CompositeRouteProvider(
     }
 
   private def exceptionHandler(implicit locale: Locale): ExceptionHandler = ExceptionHandler {
-    case NotFoundException(errors) => complete(NotFound, errorConversions.toDto(errors))
-    case SecurityException(errors) => complete(Unauthorized, errorConversions.toDto(errors))
-    case ClientException(errors)   => complete(BadRequest, errorConversions.toDto(errors))
-    case ServerException(errors)   => complete(InternalServerError, errorConversions.toDto(errors))
-    case _                         => complete(InternalServerError, errorConversions.toDto(RealWorldError.InternalServerError))
+    case NotFoundException(errors, _)    => complete(NotFound, errorConversions.toDto(errors))
+    case CredentialsException(errors, _) => complete(Unauthorized, errorConversions.toDto(errors))
+    case ClientException(errors, _)      => complete(BadRequest, errorConversions.toDto(errors))
+    case ServerException(errors, _)      => complete(InternalServerError, errorConversions.toDto(errors))
+    case _                               => complete(InternalServerError, errorConversions.toDto(RealWorldError.InternalServerError))
   }
 }

@@ -1,8 +1,9 @@
 package com.melalex.realworld
 package users.route
 
-import commons.auth.web.RealWorldSecurityDirectives
 import commons.auth.service.TokenService
+import commons.auth.web.RealWorldSecurityDirectives
+import commons.validation.web.ValidationDirectives
 import commons.web.{RealWorldDirectives, RouteProvider}
 import users.dto.{UserAuthenticationDto, UserRegistrationDto, UserUpdateDto}
 import users.mapper.UserConversions
@@ -12,7 +13,6 @@ import akka.http.scaladsl.server.directives.FutureDirectives
 import akka.http.scaladsl.server.{Directives, Route}
 import cats.data._
 import cats.implicits._
-import com.melalex.realworld.commons.validation.web.ValidationDirectives
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
 
@@ -41,7 +41,7 @@ class UserRouteProvider(
         }
       }
       pathEndOrSingleSlash {
-        entity(as[UserRegistrationDto]) { registration =>
+        entity(as[UserRegistrationDto].validate) { registration =>
           complete(userService.createUser(UserConversions.toNewUser(registration)).map(UserConversions.toUserDto))
         }
       }
@@ -56,7 +56,7 @@ class UserRouteProvider(
           completeEitherT(response)
         }
         put {
-          entity(as[UserUpdateDto]) { update =>
+          entity(as[UserUpdateDto].validate) { update =>
             val response = EitherT(userService.updateUser(auth.principal.id, UserConversions.toUserUpdate(update)))
               .map(_.withToken(auth.token))
               .map(UserConversions.toUserDto)

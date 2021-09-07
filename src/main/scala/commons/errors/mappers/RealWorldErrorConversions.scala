@@ -15,7 +15,7 @@ class RealWorldErrorConversions(
 
   def toDto(source: Seq[RealWorldError])(implicit locale: Locale): RealWorldErrorDto = {
     val errors = source
-      .map(it => i18nService.getMessage(it.messageCode, it.arguments))
+      .map(it => i18nService.getMessage(it.messageCode, it.arguments: _*))
 
     RealWorldErrorDto(errors)
   }

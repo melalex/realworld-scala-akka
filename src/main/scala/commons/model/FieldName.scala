@@ -5,7 +5,7 @@ import commons.i18n.util.MessageKeys
 
 import scala.reflect.runtime.universe._
 
-case class FieldName[A: TypeTag](value: String) extends AnyVal
+case class FieldName[A: TypeTag](value: String)
 
 object FieldName extends MessageKeys {
 

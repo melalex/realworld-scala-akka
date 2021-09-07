@@ -1,7 +1,6 @@
 package com.melalex.realworld
 package commons.errors.model
 
-import commons.errors.{ClientException, NotFoundException, SecurityException, ServerException}
 import commons.i18n.util.MessageKeys
 import commons.model.ModelId
 
@@ -18,7 +17,7 @@ object RealWorldError extends MessageKeys {
 
   type ExceptionFactory[A] = RealWorldError => A
 
-  implicit val securityFactory: ExceptionFactory[SecurityException] = it => SecurityException(Seq(it))
+  implicit val securityFactory: ExceptionFactory[CredentialsException] = it => CredentialsException(Seq(it))
   implicit val notFoundFactory: ExceptionFactory[NotFoundException] = it => NotFoundException(Seq(it))
   implicit val clientFactory: ExceptionFactory[ClientException]     = it => ClientException(Seq(it))
   implicit val serverFactory: ExceptionFactory[ServerException]     = it => ServerException(Seq(it))

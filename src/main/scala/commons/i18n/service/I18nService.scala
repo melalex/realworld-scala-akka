@@ -5,5 +5,7 @@ import java.util.Locale
 
 trait I18nService {
 
-  def getMessage(key: String, args: Any*)(implicit locale: Locale): String
+  def getMessage(key: String, args: String*)(implicit locale: Locale): String
+
+  def getMessageOrKey(key: String)(implicit locale: Locale): String
 }
