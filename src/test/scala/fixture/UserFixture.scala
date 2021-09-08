@@ -4,9 +4,34 @@ package fixture
 import commons.auth.model.{ActualUserPrincipal, SecurityToken, UserPrincipalWithToken}
 import commons.model.ModelId
 import fixture.UserFixture._
+import users.dto.{UserDto, UserRegistrationDto, UserUpdateDto}
 import users.model._
 
 trait UserFixture {
+
+  val userRegistrationDto: UserRegistrationDto = UserRegistrationDto(
+    UserRegistrationDto.Body(
+      username = Username,
+      email = Email,
+      password = PlainTextPassword
+    )
+  )
+
+  val userUpdateDto: UserUpdateDto = UserUpdateDto(
+    UserUpdateDto.Body(
+      email = UpdatedEmail,
+      bio = UpdatedBio,
+      image = UpdatedImage
+    )
+  )
+
+  val savedUserDto: UserDto = UserDto(
+    email = Email,
+    token = ValidSecurityToken.value,
+    username = Username,
+    bio = Bio,
+    image = Image
+  )
 
   val newUser: NewUser = NewUser(
     username = Username,
