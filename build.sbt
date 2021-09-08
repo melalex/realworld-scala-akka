@@ -6,18 +6,18 @@ idePackagePrefix := Some("com.melalex.realworld")
 Test / fork := true
 
 libraryDependencies ++= {
-  val akkaHttpVersion       = "10.2.0"
-  val akkaVersion           = "2.6.8"
-  val akkaJsonVersion       = "1.34.0"
-  val macWireVersion        = "2.3.7"
-  val circeVersion          = "0.13.0"
-  val logbackVersion        = "1.2.3"
-  val pureConfigVersion     = "0.13.0"
-  val scalaTestVersion      = "3.2.1"
-  val scalaMockVersion      = "5.0.0"
+  val akkaHttpVersion       = "10.2.6"
+  val akkaVersion           = "2.6.16"
+  val akkaJsonVersion       = "1.37.0"
+  val macWireVersion        = "2.4.1"
+  val circeVersion          = "0.14.1"
+  val logbackVersion        = "1.2.5"
+  val pureConfigVersion     = "0.16.0"
+  val scalaTestVersion      = "3.2.9"
+  val mockitoVersion        = "1.16.39"
   val chimneyVersion        = "0.6.1"
-  val slickVersion          = "3.3.2"
-  val catsVersion           = "3.2.5"
+  val slickVersion          = "3.3.3"
+  val catsVersion           = "3.2.7"
   val jwtVersion            = "9.0.1"
   val mysqlVersion          = "8.0.26"
   val testContainersVersion = "0.39.7"
@@ -61,7 +61,7 @@ libraryDependencies ++= {
 
   val testDependencies = List(
     "org.scalatest"     %% "scalatest"                      % scalaTestVersion      % Test,
-    "org.scalamock"     %% "scalamock"                      % scalaMockVersion      % Test,
+    "org.mockito"       %% "mockito-scala-scalatest"        % mockitoVersion        % Test,
     "com.typesafe.akka" %% "akka-http-testkit"              % akkaHttpVersion       % Test,
     "com.typesafe.akka" %% "akka-actor-testkit-typed"       % akkaVersion           % Test,
     "com.typesafe.akka" %% "akka-stream-testkit"            % akkaVersion           % Test,

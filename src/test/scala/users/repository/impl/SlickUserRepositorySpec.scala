@@ -2,114 +2,66 @@ package com.melalex.realworld
 package users.repository.impl
 
 import commons.model.ModelId
-import fixture.{DatabaseTestKit, UserFixture}
+import fixture.{DatabaseFixture, RealWorldSpec, UserFixture}
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
-
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
-
-class SlickUserRepositorySpec
-    extends AnyWordSpec
-    with ScalaFutures
-    with Matchers
-    with OptionValues
-    with DatabaseTestKit
-    with BeforeAndAfterEach {
-
-  implicit val customPatience: PatienceConfig = PatienceConfig(timeout = Span(5, Seconds), interval = Span(5, Millis))
+class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with UserFixture {
 
   private val slickUserRepository = new SlickUserRepository()
 
-  override protected def beforeEach(): Unit = {
-    Await.ready(dbBootstrap.init(slickUserRepository), 5.seconds)
-    super.beforeEach()
-  }
+  override protected def beforeEach(): Unit = setUp(slickUserRepository)
+  override protected def afterEach(): Unit  = tearDown(slickUserRepository)
 
-  override protected def afterEach(): Unit = {
-    super.afterEach()
-    Await.ready(dbBootstrap.drop(slickUserRepository), 5.seconds)
-  }
+  "save" should "create new user when UnSavedUser is provided" in {
+    val saveAndFind = slickUserRepository
+      .save(unSavedUser)
+      .map(_.id)
+      .flatMap(slickUserRepository.findById)
+      .map(_.value)
 
-  "save" when {
-
-    "is called on UnSavedUser" should {
-
-      "create new user" in new UserFixture {
-        val saveAndFind = slickUserRepository
-          .save(unSaved)
-          .map(_.id)
-          .flatMap(slickUserRepository.findById)
-          .map(_.value)
-
-        whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
-          it.id should not be ModelId.UnSaved
-          it shouldBe unSaved.asSaved(it.id)
-        }
-      }
-    }
-
-    "is called on SavedUser" should {
-
-      "update existing user" in new UserFixture {
-        val newBio = "New test bio"
-
-        val saveUpdateAndFind = slickUserRepository
-          .save(unSaved)
-          .map(_.copy(bio = Some(newBio)))
-          .flatMap(slickUserRepository.save)
-          .map(_.id)
-          .flatMap(slickUserRepository.findById)
-          .map(_.value)
-
-        whenReady(dbInterpreter.executeTransitionally(saveUpdateAndFind)) { it =>
-          it.bio should not be UserFixture.Bio
-          it.bio shouldBe Some(newBio)
-        }
-      }
+    whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
+      it.id should not be ModelId.UnSaved
+      it shouldBe unSavedUser.asSaved(it.id)
     }
   }
 
-  "findById" when {
+  it should "update existing user when SavedUser is provided" in {
+    val newBio = "New test bio"
 
-    "search by invalid id" should {
+    val saveUpdateAndFind = slickUserRepository
+      .save(unSavedUser)
+      .map(_.copy(bio = Some(newBio)))
+      .flatMap(slickUserRepository.save)
+      .map(_.id)
+      .flatMap(slickUserRepository.findById)
+      .map(_.value)
 
-      "return None" in {
-        whenReady(dbInterpreter.execute(slickUserRepository.findById(ModelId.UnSaved))) {
-          _ shouldBe None
-        }
-      }
+    whenReady(dbInterpreter.executeTransitionally(saveUpdateAndFind)) { it =>
+      it.bio should not be UserFixture.Bio
+      it.bio shouldBe Some(newBio)
     }
   }
 
-  "findByEmail" when {
-
-    "when search by valid email" should {
-
-      "return user" in new UserFixture {
-        val saveAndFind = slickUserRepository
-          .save(unSaved)
-          .map(_.email)
-          .flatMap(slickUserRepository.findByEmail)
-          .map(_.value)
-
-        whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
-          it shouldBe unSaved.asSaved(it.id)
-        }
-      }
+  "findById" should "return None when invalid user id is provided" in {
+    whenReady(dbInterpreter.execute(slickUserRepository.findById(ModelId.UnSaved))) {
+      _ shouldBe None
     }
+  }
 
-    "search by invalid email" should {
+  "findByEmail" should "return user" in {
+    val saveAndFind = slickUserRepository
+      .save(unSavedUser)
+      .map(_.email)
+      .flatMap(slickUserRepository.findByEmail)
+      .map(_.value)
 
-      "return None" in {
-        whenReady(dbInterpreter.execute(slickUserRepository.findByEmail("invalid@invalid.com"))) {
-          _ shouldBe None
-        }
-      }
+    whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
+      it shouldBe unSavedUser.asSaved(it.id)
+    }
+  }
+
+  it should "return None when no user with given email is present" in {
+    whenReady(dbInterpreter.execute(slickUserRepository.findByEmail("invalid@invalid.com"))) {
+      _ shouldBe None
     }
   }
 }

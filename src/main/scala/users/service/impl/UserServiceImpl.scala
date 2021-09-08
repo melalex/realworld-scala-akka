@@ -26,7 +26,7 @@ class UserServiceImpl[F[_]: Monad, DB[_]: Monad](
 
   def authenticateUser(email: String, password: String): F[Either[CredentialsException, UserWithToken]] = {
     val unitOfWork = OptionT(userRepository.findByEmail(email))
-      .filter(passwordHash.verify(password))
+      .filter(passwordHash.verifyForUser(password))
       .map(tokenService.generateNewTokenForUser)
       .toRight(RealWorldError.InvalidCredentials.ex[CredentialsException])
 

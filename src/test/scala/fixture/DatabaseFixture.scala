@@ -12,12 +12,13 @@ import slick.basic.DatabaseConfig
 import slick.dbio.DBIO
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
-trait DatabaseTestKit extends ForAllTestContainer with FutureInstances { self: Suite =>
+trait DatabaseFixture extends ForAllTestContainer with FutureInstances { self: Suite =>
 
-  implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit def executionContext: ExecutionContext
 
   override val container: MySQLContainer = MySQLContainer(databaseName = "realworld")
 
@@ -36,4 +37,8 @@ trait DatabaseTestKit extends ForAllTestContainer with FutureInstances { self: S
   lazy val dbBootstrap: DbBootstrap[Future, DBIO]     = wire[DbBootstrap[Future, DBIO]]
 
   lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("mysql", config)
+
+  def setUp(initRequired: DbInitRequired[DBIO]*): Unit = Await.ready(dbBootstrap.init(initRequired), 5.seconds)
+
+  def tearDown(droppable: Droppable[DBIO]*): Unit = Await.ready(dbBootstrap.drop(droppable), 5.seconds)
 }

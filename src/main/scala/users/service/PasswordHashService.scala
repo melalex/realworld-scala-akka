@@ -14,6 +14,6 @@ object PasswordHashService {
 
   implicit class PasswordHashServiceOps(val value: PasswordHashService) extends AnyVal {
 
-    def verify(plainTextPassword: String)(actualUser: User): Boolean = value.verify(plainTextPassword, actualUser.password)
+    def verifyForUser(plainTextPassword: String)(actualUser: User): Boolean = value.verify(plainTextPassword, actualUser.password)
   }
 }
