@@ -28,5 +28,4 @@ object UserUpdateDto extends RealWorldValidation {
         .mapN(Body)
         .map(UserUpdateDto(_))
   }
-
 }

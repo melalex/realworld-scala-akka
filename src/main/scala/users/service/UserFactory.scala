@@ -9,15 +9,13 @@ class UserFactory(
     passwordHashService: PasswordHashService
 ) {
 
-  def createNewUser(newUser: NewUser): UnSavedUser = {
+  def createNewUser(newUser: NewUser): UnsavedUser = {
     val now = instantProvider.provide()
 
-    UnSavedUser(
+    UnsavedUser(
       email = newUser.email,
       username = newUser.username,
       password = passwordHashService.hash(newUser.password),
-      bio = None,
-      image = None,
       createdAt = now,
       updatedAt = now
     )

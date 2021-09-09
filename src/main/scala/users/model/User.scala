@@ -11,8 +11,6 @@ sealed trait User {
   val email: String
   val username: String
   val password: PasswordHash
-  val bio: Option[String]
-  val image: Option[String]
   val createdAt: Instant
   val updatedAt: Instant
 }
@@ -28,12 +26,10 @@ case class SavedUser(
     updatedAt: Instant
 ) extends User
 
-case class UnSavedUser(
+case class UnsavedUser(
     email: String,
     username: String,
     password: PasswordHash,
-    bio: Option[String],
-    image: Option[String],
     createdAt: Instant,
     updatedAt: Instant
 ) extends User
@@ -60,15 +56,15 @@ object User {
     def withToken(token: SecurityToken): UserWithToken = UserWithToken(value, token)
   }
 
-  implicit class UnSavedUserOps(val value: UnSavedUser) extends AnyVal {
+  implicit class UnSavedUserOps(val value: UnsavedUser) extends AnyVal {
 
     def asSaved(id: ModelId): SavedUser = SavedUser(
       id = id,
       email = value.email,
       username = value.username,
       password = value.password,
-      bio = value.bio,
-      image = value.image,
+      bio = None,
+      image = None,
       createdAt = value.createdAt,
       updatedAt = value.updatedAt
     )

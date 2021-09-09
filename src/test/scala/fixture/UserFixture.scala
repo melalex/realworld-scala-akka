@@ -45,12 +45,10 @@ trait UserFixture {
     image = UpdatedImage
   )
 
-  val unSavedUser: UnSavedUser = UnSavedUser(
+  val unsavedUser: UnsavedUser = UnsavedUser(
     email = Email,
     username = Username,
     password = Password,
-    bio = Bio,
-    image = Image,
     createdAt = FixedInstantProvider.Now,
     updatedAt = FixedInstantProvider.Now
   )
@@ -101,8 +99,8 @@ object UserFixture {
   val Username: String          = "Username"
   val PlainTextPassword: String = "Password"
   val Password: PasswordHash    = PasswordHash("$2a$10$Ff1/qYQliPCtCiIsidqX6eu.JFb3ab9moRtKhCuh2GTj9r2G81LKK")
-  val Bio: Some[String]         = Some("Bio")
-  val Image: Some[String]       = Some("Image")
+  val Bio: Option[String]       = None
+  val Image: Option[String]     = None
   val ValidSecurityToken: SecurityToken = SecurityToken(
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJyZWFsd29ybGQiLCJleHAiOjE2MzExNDU2MDAsImlhdCI6MTYzMTEwMjQwMCwiaWQiOnsidmFsdWUiOjF9LCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJ1c2VybmFtZSI6IlVzZXJuYW1lIn0.rKu2XvmEhhKRyMldr496hh0UvrqdXhoCXeSd9zMRZy4")
 

@@ -54,8 +54,8 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
   }
 
   "createUser" should "return UserWithToken" in {
-    userFactory.createNewUser(newUser) returns unSavedUser
-    userRepository.save(unSavedUser) returns savedUser
+    userFactory.createNewUser(newUser) returns unsavedUser
+    userRepository.save(unsavedUser) returns savedUser
     tokenService.generateNewToken(actualUserPrincipal) returns UserFixture.ValidSecurityToken
 
     val actual = userService.createUser(newUser)

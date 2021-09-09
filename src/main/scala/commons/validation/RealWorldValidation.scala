@@ -21,11 +21,11 @@ trait RealWorldValidation {
   trait Max[F]      extends ((F, Int) => Boolean)
   trait RegEx[F]    extends ((F, Regex) => Boolean)
 
-  implicit val requiredString: Required[String]  = _.nonEmpty
-  implicit val minimumStringLength: Min[String]  = _.length >= _
-  implicit val maximumStringLength: Max[String]  = _.length <= _
-  implicit val maximumOptionStringLength: Max[Option[String]]  = (opt, limit) => opt.forall(_.length <= limit)
-  implicit val stringMatchesRegEx: RegEx[String] = (str, regex) => (regex findFirstIn str).isDefined
+  implicit val requiredString: Required[String]               = _.nonEmpty
+  implicit val minimumStringLength: Min[String]               = _.length >= _
+  implicit val maximumStringLength: Max[String]               = _.length <= _
+  implicit val maximumOptionStringLength: Max[Option[String]] = (opt, limit) => opt.forall(_.length <= limit)
+  implicit val stringMatchesRegEx: RegEx[String]              = (str, regex) => (regex findFirstIn str).isDefined
 
   def required[F](implicit req: Required[F]): FieldValidation[F] = (fieldName, field) => fieldValidation(req(field))(EmptyField(fieldName))
 
@@ -41,6 +41,8 @@ trait RealWorldValidation {
   def email: FieldValidation[String] = regEx(EmailRegEx)
 
   def alphanumeric: FieldValidation[String] = regEx(AlphaNumericRegEx)
+
+  def validationResult[F](form: F)(implicit formValidation: FormValidation[F]): ValidationResult[F] = formValidation(form)
 
   def validateForm[F, A](form: F)(f: ValidationResult[F] => A)(implicit formValidation: FormValidation[F]): A = f(formValidation(form))
 
@@ -59,8 +61,8 @@ trait RealWorldValidation {
 
 object RealWorldValidation extends RealWorldValidation {
 
-  private val EmailRegEx =
+  val EmailRegEx: Regex =
     """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
 
-  private val AlphaNumericRegEx = """^[a-zA-Z0-9_]*$""".r
+  val AlphaNumericRegEx: Regex = """^[a-zA-Z0-9_]*$""".r
 }

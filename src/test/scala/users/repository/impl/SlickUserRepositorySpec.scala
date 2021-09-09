@@ -13,14 +13,14 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
 
   "save" should "create new user when UnSavedUser is provided" in {
     val saveAndFind = slickUserRepository
-      .save(unSavedUser)
+      .save(unsavedUser)
       .map(_.id)
       .flatMap(slickUserRepository.findById)
       .map(_.value)
 
     whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
       it.id should not be ModelId.UnSaved
-      it shouldBe unSavedUser.asSaved(it.id)
+      it shouldBe unsavedUser.asSaved(it.id)
     }
   }
 
@@ -28,7 +28,7 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
     val newBio = "New test bio"
 
     val saveUpdateAndFind = slickUserRepository
-      .save(unSavedUser)
+      .save(unsavedUser)
       .map(_.copy(bio = Some(newBio)))
       .flatMap(slickUserRepository.save)
       .map(_.id)
@@ -49,13 +49,13 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
 
   "findByEmail" should "return user" in {
     val saveAndFind = slickUserRepository
-      .save(unSavedUser)
+      .save(unsavedUser)
       .map(_.email)
       .flatMap(slickUserRepository.findByEmail)
       .map(_.value)
 
     whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
-      it shouldBe unSavedUser.asSaved(it.id)
+      it shouldBe unsavedUser.asSaved(it.id)
     }
   }
 

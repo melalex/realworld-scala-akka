@@ -3,7 +3,7 @@ package users.repository.impl
 
 import commons.db.{DbInitRequired, Droppable}
 import commons.model.ModelId
-import users.model.{PasswordHash, SavedUser, UnSavedUser, User}
+import users.model.{PasswordHash, SavedUser, UnsavedUser, User}
 import users.repository.UserRepository
 import users.repository.impl.SlickUserRepository.UserQuery
 
@@ -26,7 +26,7 @@ class SlickUserRepository(
 
   override def save(user: User): DBIO[SavedUser] = user match {
     case it: SavedUser   => UserQuery.update(it).andThen(DBIO.successful(it))
-    case it: UnSavedUser => (UserQuery.returning(UserQuery.map(_.id)) += it.asSaved(ModelId.UnSaved)).map(id => it.asSaved(id))
+    case it: UnsavedUser => (UserQuery.returning(UserQuery.map(_.id)) += it.asSaved(ModelId.UnSaved)).map(id => it.asSaved(id))
   }
 
   override def findByEmail(email: String): DBIO[Option[SavedUser]] =
