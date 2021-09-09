@@ -2,9 +2,16 @@ package com.melalex.realworld
 package users.dto
 
 case class UserDto(
-    email: String,
-    token: String,
-    username: String,
-    bio: Option[String],
-    image: Option[String]
+    user: UserDto.Body
 )
+
+object UserDto {
+
+  case class Body(
+      email: String,
+      token: String,
+      username: String,
+      bio: Option[String],
+      image: Option[String]
+  )
+}

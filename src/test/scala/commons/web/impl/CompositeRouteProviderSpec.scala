@@ -5,23 +5,16 @@ import commons.errors.dto.RealWorldErrorDto
 import commons.errors.mappers.RealWorldErrorConversions
 import commons.errors.model._
 import commons.web.RouteProvider
-import fixture.{PropertiesFixture, RealWorldSpec}
+import fixture.{PropertiesFixture, RouteSpec}
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Language, `Accept-Language`}
 import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.mockito.{ArgumentMatchersSugar, IdiomaticMockito}
+import org.mockito.ArgumentMatchersSugar
 
 import java.util.Locale
 
-class CompositeRouteProviderSpec
-    extends RealWorldSpec
-    with PropertiesFixture
-    with IdiomaticMockito
-    with ArgumentMatchersSugar
-    with ScalatestRouteTest
-    with Directives {
+class CompositeRouteProviderSpec extends RouteSpec with PropertiesFixture with ArgumentMatchersSugar with Directives {
 
   private implicit val locale: Locale = Locale.ENGLISH
 
@@ -41,7 +34,7 @@ class CompositeRouteProviderSpec
       failWith(NotFoundException(Seq()))
     }
 
-    Get() -> `Accept-Language`(Language(locale.getLanguage)) -> compositeRouteProvider.provideRoute -> check {
+    Get()~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.NotFound
     }
   }
@@ -51,7 +44,7 @@ class CompositeRouteProviderSpec
       failWith(CredentialsException(Seq()))
     }
 
-    Get() -> `Accept-Language`(Language(locale.getLanguage)) -> compositeRouteProvider.provideRoute -> check {
+    Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
@@ -61,7 +54,7 @@ class CompositeRouteProviderSpec
       failWith(ClientException(Seq()))
     }
 
-    Get() -> `Accept-Language`(Language(locale.getLanguage)) -> compositeRouteProvider.provideRoute -> check {
+    Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.BadRequest
     }
   }
@@ -71,7 +64,7 @@ class CompositeRouteProviderSpec
       failWith(ServerException(Seq()))
     }
 
-    Get() -> `Accept-Language`(Language(locale.getLanguage)) -> compositeRouteProvider.provideRoute -> check {
+    Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.InternalServerError
     }
   }
@@ -81,7 +74,7 @@ class CompositeRouteProviderSpec
       failWith(new Throwable())
     }
 
-    Get() -> `Accept-Language`(Language(locale.getLanguage)) -> compositeRouteProvider.provideRoute -> check {
+    Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.InternalServerError
     }
   }

@@ -19,10 +19,12 @@ object UserConversions {
   )
 
   def toUserDto(source: UserWithToken): UserDto = UserDto(
-    email = source.user.email,
-    token = source.token.value,
-    username = source.user.username,
-    bio = source.user.bio,
-    image = source.user.image
+    UserDto.Body(
+      email = source.user.email,
+      token = source.token.value,
+      username = source.user.username,
+      bio = source.user.bio,
+      image = source.user.image
+    )
   )
 }
