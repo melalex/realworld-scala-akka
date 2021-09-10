@@ -30,41 +30,41 @@ class UserRouteProvider(
     with RealWorldSecurityDirectives
     with ValidationDirectives {
 
-  override def provideRoute: Route = pathPrefix("/users") {
+  override def provideRoute: Route = pathPrefix("users") {
     post {
-      path("/login") {
+      path("login") {
         entity(as[UserAuthenticationDto]) { authentication =>
           val response = EitherT(userService.authenticateUser(authentication.user.email, authentication.user.password))
             .map(UserConversions.toUserDto)
 
           completeEitherT(response)
         }
-      }
-      pathEndOrSingleSlash {
-        entity(as[UserRegistrationDto].validate) { registration =>
-          complete(userService.createUser(UserConversions.toNewUser(registration)).map(UserConversions.toUserDto))
+      } ~
+        pathEndOrSingleSlash {
+          entity(as[UserRegistrationDto].validate) { registration =>
+            complete(userService.createUser(UserConversions.toNewUser(registration)).map(UserConversions.toUserDto))
+          }
         }
-      }
-    }
-    authenticated(tokenService) { auth =>
-      pathEndOrSingleSlash {
-        get {
-          val response = EitherT(userService.getUserById(auth.principal.id))
-            .map(_.withToken(auth.token))
-            .map(UserConversions.toUserDto)
-
-          completeEitherT(response)
-        }
-        put {
-          entity(as[UserUpdateDto].validate) { update =>
-            val response = EitherT(userService.updateUser(auth.principal.id, UserConversions.toUserUpdate(update)))
+    } ~
+      authenticated(tokenService) { auth =>
+        pathEndOrSingleSlash {
+          get {
+            val response = EitherT(userService.getUserById(auth.principal.id))
               .map(_.withToken(auth.token))
               .map(UserConversions.toUserDto)
 
             completeEitherT(response)
-          }
+          } ~
+            put {
+              entity(as[UserUpdateDto].validate) { update =>
+                val response = EitherT(userService.updateUser(auth.principal.id, UserConversions.toUserUpdate(update)))
+                  .map(_.withToken(auth.token))
+                  .map(UserConversions.toUserDto)
+
+                completeEitherT(response)
+              }
+            }
         }
       }
-    }
   }
 }
