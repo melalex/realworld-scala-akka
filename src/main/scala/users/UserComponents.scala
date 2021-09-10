@@ -3,7 +3,6 @@ package users
 
 import commons.auth.service.TokenService
 import commons.db.{DBIOInstances, DbInterpreter}
-import commons.util.InstantProvider
 import commons.web.RouteProvider
 import users.repository.impl.SlickUserRepository
 import users.route.UserRouteProvider
@@ -14,13 +13,14 @@ import cats.instances.FutureInstances
 import com.softwaremill.macwire.wire
 import slick.dbio.DBIO
 
+import java.time.Clock
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserComponents { self: FutureInstances with DBIOInstances =>
 
-  def instantProvider: InstantProvider
   def tokenService: TokenService
   def dbInterpreter: DbInterpreter[Future, DBIO]
+  def clock: Clock
 
   implicit def executor: ExecutionContext
 

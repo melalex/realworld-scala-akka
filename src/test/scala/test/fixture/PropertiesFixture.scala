@@ -1,9 +1,11 @@
 package com.melalex.realworld
-package fixture
+package test.fixture
 
 import config.{RealWorldProperties, ServerProperties, SessionProperties}
 
 import java.time.Duration
+import scala.concurrent.duration.DurationInt
+import scala.language.postfixOps
 
 trait PropertiesFixture {
 
@@ -13,7 +15,7 @@ trait PropertiesFixture {
       port = 8080
     ),
     SessionProperties(
-      ttl = Duration.ofHours(12),
+      ttl = 12 hours,
       jwtSecretKey = "realworld-secret-key",
       jwtIssuer = "realworld"
     ),

@@ -1,11 +1,14 @@
 package com.melalex.realworld
-package fixture
+package test.fixture
 
 import commons.auth.model.{ActualUserPrincipal, SecurityToken, UserPrincipalWithToken}
 import commons.model.ModelId
-import fixture.UserFixture._
+import test.fixture.UserFixture._
+import test.util.TimeSupport
 import users.dto.{UserAuthenticationDto, UserDto, UserRegistrationDto, UserUpdateDto}
 import users.model._
+
+import org.scalactic.Uniformity
 
 trait UserFixture {
 
@@ -45,7 +48,7 @@ trait UserFixture {
   val savedUserAfterUpdateDto: UserDto = UserDto(
     UserDto.Body(
       email = UpdatedEmail,
-      token = ValidSecurityToken.value,
+      token = ValidSecurityTokenAfterUpdate.value,
       username = Username,
       bio = UpdatedBio,
       image = UpdatedImage
@@ -68,8 +71,8 @@ trait UserFixture {
     email = Email,
     username = Username,
     password = Password,
-    createdAt = FixedInstantProvider.Now,
-    updatedAt = FixedInstantProvider.Now
+    createdAt = TimeSupport.Now,
+    updatedAt = TimeSupport.Now
   )
 
   val savedUser: SavedUser = SavedUser(
@@ -79,8 +82,8 @@ trait UserFixture {
     password = Password,
     bio = Bio,
     image = Image,
-    createdAt = FixedInstantProvider.Now,
-    updatedAt = FixedInstantProvider.Now
+    createdAt = TimeSupport.Now,
+    updatedAt = TimeSupport.Now
   )
 
   val savedUserAfterUpdate: SavedUser = SavedUser(
@@ -90,8 +93,13 @@ trait UserFixture {
     password = Password,
     bio = UpdatedBio,
     image = UpdatedImage,
-    createdAt = FixedInstantProvider.Now,
-    updatedAt = FixedInstantProvider.Now
+    createdAt = TimeSupport.Now,
+    updatedAt = TimeSupport.Now
+  )
+
+  val userWithTokenAfterUpdate: UserWithToken = UserWithToken(
+    user = savedUserAfterUpdate,
+    token = ValidSecurityTokenAfterUpdate
   )
 
   val userWithToken: UserWithToken = UserWithToken(
@@ -105,10 +113,28 @@ trait UserFixture {
     username = Username
   )
 
+  val actualUserPrincipalAfterUpdate: ActualUserPrincipal = ActualUserPrincipal(
+    id = Id,
+    email = UpdatedEmail,
+    username = Username
+  )
+
   val userPrincipalWithToken: UserPrincipalWithToken = UserPrincipalWithToken(
     principal = actualUserPrincipal,
     token = ValidSecurityToken
   )
+
+  val unTokenized: Uniformity[UserDto] = new Uniformity[UserDto] {
+
+    override def normalizedOrSame(b: Any): Any = b match {
+      case s: UserDto => normalized(s)
+      case _          => b
+    }
+
+    override def normalizedCanHandle(b: Any): Boolean = b.isInstanceOf[UserDto]
+
+    override def normalized(a: UserDto): UserDto = a.copy(a.user.copy(token = TokenPlaceholder))
+  }
 }
 
 object UserFixture {
@@ -126,4 +152,8 @@ object UserFixture {
   val UpdatedEmail: String       = "newtest@test.com"
   val UpdatedBio: Some[String]   = Some("NewBio")
   val UpdatedImage: Some[String] = Some("NewImage")
+  val ValidSecurityTokenAfterUpdate: SecurityToken = SecurityToken(
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJyZWFsd29ybGQiLCJleHAiOjE2MzExNDU2MDAsImlhdCI6MTYzMTEwMjQwMCwiaWQiOnsidmFsdWUiOjF9LCJlbWFpbCI6Im5ld3Rlc3RAdGVzdC5jb20iLCJ1c2VybmFtZSI6IlVzZXJuYW1lIn0.nJ6fsstS4QlhLrdanECKuDXNNZMfAaVaCj_7wkWZSiU")
+
+  private val TokenPlaceholder = "***"
 }

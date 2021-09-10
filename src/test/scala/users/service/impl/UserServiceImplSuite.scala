@@ -3,14 +3,16 @@ package users.service.impl
 
 import commons.auth.service.TokenService
 import commons.errors.model.{CredentialsException, NotFoundException, RealWorldError}
-import fixture.{IdDbInterpreter, RealWorldSpec, UserFixture}
+import test.fixture.UserFixture
+import test.spec.UnitTestSpec
+import test.util.IdDbInterpreter
 import users.repository.UserRepository
 import users.service.{PasswordHashService, UserFactory}
 
 import cats._
 import org.mockito.scalatest.IdiomaticMockito
 
-class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserFixture {
+class UserServiceImplSuite extends UnitTestSpec with IdiomaticMockito with UserFixture {
 
   private lazy val userRepository = mock[UserRepository[Id]]
   private lazy val dbInterpreter  = IdDbInterpreter
@@ -33,7 +35,7 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.authenticateUser(UserFixture.Email, UserFixture.PlainTextPassword)
 
-    actual shouldBe Right(userWithToken)
+    actual shouldEqual Right(userWithToken)
   }
 
   it should "return CredentialsException when credentials is invalid" in {
@@ -42,7 +44,7 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.authenticateUser(UserFixture.Email, UserFixture.PlainTextPassword)
 
-    actual shouldBe Left(CredentialsException(Seq(RealWorldError.InvalidCredentials)))
+    actual shouldEqual Left(CredentialsException(Seq(RealWorldError.InvalidCredentials)))
   }
 
   it should "return CredentialsException when user not found" in {
@@ -50,7 +52,7 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.authenticateUser(UserFixture.Email, UserFixture.PlainTextPassword)
 
-    actual shouldBe Left(CredentialsException(Seq(RealWorldError.InvalidCredentials)))
+    actual shouldEqual Left(CredentialsException(Seq(RealWorldError.InvalidCredentials)))
   }
 
   "createUser" should "return UserWithToken" in {
@@ -60,17 +62,18 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.createUser(newUser)
 
-    actual shouldBe userWithToken
+    actual shouldEqual userWithToken
   }
 
-  "updateUser" should "return SavedUser" in {
+  "updateUser" should "return UserWithToken" in {
     userRepository.findById(UserFixture.Id) returns Some(savedUser)
     userFactory.createUpdatedUser(savedUser, updateUser) returns savedUserAfterUpdate
     userRepository.save(savedUserAfterUpdate) returns savedUserAfterUpdate
+    tokenService.generateNewToken(actualUserPrincipalAfterUpdate) returns UserFixture.ValidSecurityTokenAfterUpdate
 
     val actual = userService.updateUser(UserFixture.Id, updateUser)
 
-    actual shouldBe Right(savedUserAfterUpdate)
+    actual shouldEqual Right(userWithTokenAfterUpdate)
   }
 
   it should "return NotFoundException when no user found" in {
@@ -78,15 +81,16 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.updateUser(UserFixture.Id, updateUser)
 
-    actual shouldBe Left(NotFoundException(Seq(RealWorldError.NotFound(UserFixture.Id))))
+    actual shouldEqual Left(NotFoundException(Seq(RealWorldError.NotFound(UserFixture.Id))))
   }
 
-  "getUserById" should "return SavedUser" in {
+  "getUserById" should "return UserWithToken" in {
     userRepository.findById(UserFixture.Id) returns Some(savedUser)
+    tokenService.generateNewToken(actualUserPrincipal) returns UserFixture.ValidSecurityToken
 
     val actual = userService.getUserById(UserFixture.Id)
 
-    actual shouldBe Right(savedUser)
+    actual shouldEqual Right(userWithToken)
   }
 
   it should "return NotFoundException when no user found" in {
@@ -94,6 +98,6 @@ class UserServiceImplSpec extends RealWorldSpec with IdiomaticMockito with UserF
 
     val actual = userService.getUserById(UserFixture.Id)
 
-    actual shouldBe Left(NotFoundException(Seq(RealWorldError.NotFound(UserFixture.Id))))
+    actual shouldEqual Left(NotFoundException(Seq(RealWorldError.NotFound(UserFixture.Id))))
   }
 }

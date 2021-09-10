@@ -9,6 +9,7 @@ import config.RealWorldProperties
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
+import com.typesafe.scalalogging.Logger
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
 
@@ -21,6 +22,8 @@ class CompositeRouteProvider(
 ) extends I18nDirectives
     with FailFastCirceSupport
     with Directives {
+
+  private val logger = Logger[CompositeRouteProvider]
 
   def provideRoute: Route =
     locale(realWorldProperties.supportedLocales) { implicit locale =>
@@ -36,6 +39,9 @@ class CompositeRouteProvider(
     case CredentialsException(errors, _) => complete(Unauthorized, errorConversions.toDto(errors))
     case ClientException(errors, _)      => complete(BadRequest, errorConversions.toDto(errors))
     case ServerException(errors, _)      => complete(InternalServerError, errorConversions.toDto(errors))
-    case _                               => complete(InternalServerError, errorConversions.toDto(RealWorldError.InternalServerError))
+
+    case ex =>
+      logger.error("Handled exception", ex)
+      complete(InternalServerError, errorConversions.toDto(RealWorldError.InternalServerError))
   }
 }

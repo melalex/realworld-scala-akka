@@ -1,5 +1,5 @@
 package com.melalex.realworld
-package fixture
+package test.util
 
 import commons.db.DbInterpreter
 

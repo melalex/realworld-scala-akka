@@ -1,16 +1,17 @@
 package com.melalex.realworld
 package users.service
 
-import commons.util.InstantProvider
 import users.model._
 
+import java.time.{Clock, Instant}
+
 class UserFactory(
-    instantProvider: InstantProvider,
+    clock: Clock,
     passwordHashService: PasswordHashService
 ) {
 
   def createNewUser(newUser: NewUser): UnsavedUser = {
-    val now = instantProvider.provide()
+    val now = Instant.now(clock)
 
     UnsavedUser(
       email = newUser.email,
@@ -25,6 +26,6 @@ class UserFactory(
     email = updateUser.email,
     bio = updateUser.bio,
     image = updateUser.image,
-    updatedAt = instantProvider.provide()
+    updatedAt = Instant.now(clock)
   )
 }

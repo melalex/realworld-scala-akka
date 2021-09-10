@@ -4,7 +4,7 @@ package commons.auth.service.impl
 import commons.auth.model.{ActualUserPrincipal, SecurityToken, UserPrincipalWithToken}
 import commons.auth.service.TokenService
 import commons.errors.model.{CredentialsException, RealWorldError}
-import commons.util.InstantProvider
+import commons.util.JavaConversions
 import config.RealWorldProperties
 
 import io.circe.generic.auto._
@@ -13,10 +13,12 @@ import io.circe.syntax._
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.{JwtAlgorithm, JwtCirce, JwtClaim}
 
-class JwtTokenService(instantProvider: InstantProvider, realWorldProperties: RealWorldProperties) extends TokenService {
+import java.time.Instant
+
+class JwtTokenService(realWorldProperties: RealWorldProperties, jwtCirce: JwtCirce) extends TokenService with JavaConversions {
 
   override def validateToken(token: SecurityToken): Either[CredentialsException, UserPrincipalWithToken] =
-    JwtCirce
+    jwtCirce
       .decode(token.value, realWorldProperties.session.jwtSecretKey, Seq(JwtTokenService.EncodingAlgorithm))
       .toEither
       .flatMap(it => decode[ActualUserPrincipal](it.content))
@@ -25,11 +27,11 @@ class JwtTokenService(instantProvider: InstantProvider, realWorldProperties: Rea
       .map(ex => CredentialsException(Seq(RealWorldError.InvalidToken), ex))
 
   override def generateNewToken(principal: ActualUserPrincipal): SecurityToken = {
-    val now = instantProvider.provide()
+    val now = Instant.now(jwtCirce.clock)
     val claim = JwtClaim(
       content = principal.asJson.noSpaces,
       issuer = Some(realWorldProperties.session.jwtIssuer),
-      expiration = Some(now.plus(realWorldProperties.session.ttl).getEpochSecond),
+      expiration = Some(now.plus(realWorldProperties.session.ttl.asJava).getEpochSecond),
       issuedAt = Some(now.getEpochSecond)
     )
 

@@ -4,7 +4,6 @@ package commons.i18n.util
 import commons.i18n.util.MessageKeys.ModelKeyPrefix
 import commons.model.FieldName
 
-import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 trait MessageKeys {

@@ -16,9 +16,10 @@ import cats.instances.FutureInstances
 import com.softwaremill.macwire.{wire, wireSet}
 import slick.dbio.DBIO
 
+import java.time.Clock
+
 trait AppComponents
     extends PureConfigComponents
-    with AkkaComponents
     with UserComponents
     with I18nComponents
     with ErrorComponents

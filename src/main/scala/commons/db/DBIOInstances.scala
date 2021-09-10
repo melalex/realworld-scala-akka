@@ -4,7 +4,6 @@ package commons.db
 import cats.Monad
 import slick.dbio.DBIO
 
-import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext
 
 trait DBIOInstances {

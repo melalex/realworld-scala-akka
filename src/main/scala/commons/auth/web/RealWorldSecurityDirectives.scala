@@ -5,6 +5,7 @@ import commons.auth.model.{SecurityToken, UserPrincipalWithToken}
 import commons.auth.service.TokenService
 
 import akka.http.scaladsl.model.HttpHeader
+import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.{Directive1, Directives}
 
 trait RealWorldSecurityDirectives { self: Directives =>
@@ -18,8 +19,8 @@ trait RealWorldSecurityDirectives { self: Directives =>
       }
 
   private def extractSecurityToken: HttpHeader => Option[SecurityToken] = {
-    case header: AuthorizationHeader => Some(header.token)
-    case _                           => None
+    case header: Authorization => Some(SecurityToken(header.credentials.token()))
+    case _                     => None
   }
 }
 

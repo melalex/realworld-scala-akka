@@ -50,17 +50,17 @@ object SlickUserRepository {
 
   class UserSchema(tag: Tag) extends Table[SavedUser](tag, "user") {
 
-    def id: Rep[ModelId]            = column[ModelId]("id", O.PrimaryKey, O.AutoInc)
-    def email: Rep[String]          = column[String]("email", O.Unique, O.Length(320))
-    def username: Rep[String]       = column[String]("username", O.Unique, O.Length(40))
-    def password: Rep[PasswordHash] = column[PasswordHash]("password")
-    def bio: Rep[String]            = column[String]("bio", O.Length(254))
-    def image: Rep[String]          = column[String]("image")
-    def createdAt: Rep[Instant]     = column[Instant]("created_at")
-    def updatedAt: Rep[Instant]     = column[Instant]("updated_at")
+    def id        = column[ModelId]("id", O.PrimaryKey, O.AutoInc)
+    def email     = column[String]("email", O.Unique, O.Length(320))
+    def username  = column[String]("username", O.Unique, O.Length(40))
+    def password  = column[PasswordHash]("password", O.Length(240))
+    def bio       = column[Option[String]]("bio", O.Length(254))
+    def image     = column[Option[String]]("image", O.Length(320))
+    def createdAt = column[Instant]("created_at")
+    def updatedAt = column[Instant]("updated_at")
 
     override def * : ProvenShape[SavedUser] =
-      (id, email, username, password, bio.?, image.?, createdAt, updatedAt) <>
+      (id, email, username, password, bio, image, createdAt, updatedAt) <>
         ((SavedUser.apply _).tupled, SavedUser.unapply)
   }
 }

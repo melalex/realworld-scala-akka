@@ -1,6 +1,6 @@
 package com.melalex.realworld
 
-import config.AppComponents
+import config.{AkkaComponents, AppComponents}
 
 import akka.actor.Terminated
 import akka.http.scaladsl.Http
@@ -9,7 +9,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object RealWorldApp extends App with AppComponents {
+object RealWorldApp extends App with AppComponents with AkkaComponents {
 
   private def initDatabase(): Future[Unit] =
     dbBootstrap.init(initRequired.toSeq)

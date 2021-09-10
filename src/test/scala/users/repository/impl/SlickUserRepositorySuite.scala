@@ -2,9 +2,10 @@ package com.melalex.realworld
 package users.repository.impl
 
 import commons.model.ModelId
-import fixture.{DatabaseFixture, RealWorldSpec, UserFixture}
+import test.fixture.UserFixture
+import test.spec.RepositorySpec
 
-class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with UserFixture {
+class SlickUserRepositorySuite extends RepositorySpec with UserFixture {
 
   private val slickUserRepository = new SlickUserRepository()
 
@@ -20,7 +21,7 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
 
     whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
       it.id should not be ModelId.UnSaved
-      it shouldBe unsavedUser.asSaved(it.id)
+      it shouldEqual unsavedUser.asSaved(it.id)
     }
   }
 
@@ -37,13 +38,13 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
 
     whenReady(dbInterpreter.executeTransitionally(saveUpdateAndFind)) { it =>
       it.bio should not be UserFixture.Bio
-      it.bio shouldBe Some(newBio)
+      it.bio shouldEqual Some(newBio)
     }
   }
 
   "findById" should "return None when invalid user id is provided" in {
     whenReady(dbInterpreter.execute(slickUserRepository.findById(ModelId.UnSaved))) {
-      _ shouldBe None
+      _ shouldEqual None
     }
   }
 
@@ -55,13 +56,13 @@ class SlickUserRepositorySpec extends RealWorldSpec with DatabaseFixture with Us
       .map(_.value)
 
     whenReady(dbInterpreter.executeTransitionally(saveAndFind)) { it =>
-      it shouldBe unsavedUser.asSaved(it.id)
+      it shouldEqual unsavedUser.asSaved(it.id)
     }
   }
 
   it should "return None when no user with given email is present" in {
     whenReady(dbInterpreter.execute(slickUserRepository.findByEmail("invalid@invalid.com"))) {
-      _ shouldBe None
+      _ shouldEqual None
     }
   }
 }

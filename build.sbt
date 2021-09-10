@@ -22,6 +22,7 @@ libraryDependencies ++= {
   val mysqlVersion          = "8.0.26"
   val testContainersVersion = "0.39.7"
   val jbcryptVersion        = "0.4"
+  val scalaLoggingVersion   = "3.9.4"
 
   val akkaDependencies = List(
     "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
@@ -46,11 +47,12 @@ libraryDependencies ++= {
   )
 
   val utilDependencies = List(
-    "ch.qos.logback"           % "logback-classic" % logbackVersion,
-    "com.softwaremill.macwire" %% "macros"         % macWireVersion,
-    "com.github.pureconfig"    %% "pureconfig"     % pureConfigVersion,
-    "io.scalaland"             %% "chimney"        % chimneyVersion,
-    "org.mindrot"              % "jbcrypt"         % jbcryptVersion
+    "com.typesafe.scala-logging" %% "scala-logging"  % scalaLoggingVersion,
+    "com.softwaremill.macwire"   %% "macros"         % macWireVersion,
+    "com.github.pureconfig"      %% "pureconfig"     % pureConfigVersion,
+    "io.scalaland"               %% "chimney"        % chimneyVersion,
+    "ch.qos.logback"             % "logback-classic" % logbackVersion,
+    "org.mindrot"                % "jbcrypt"         % jbcryptVersion
   )
 
   val databaseDependencies = List(

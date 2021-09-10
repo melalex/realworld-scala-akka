@@ -2,8 +2,8 @@ package com.melalex.realworld
 package users.route
 
 import commons.auth.service.TokenService
-import commons.auth.web.AuthorizationHeader
-import fixture.{RouteSpec, UserFixture}
+import test.fixture.UserFixture
+import test.spec.RouteSpec
 import users.dto.UserDto
 import users.service.UserService
 
@@ -12,7 +12,7 @@ import io.circe.generic.auto._
 
 import scala.concurrent.Future
 
-class UserRouteProviderSpec extends RouteSpec with UserFixture {
+class UserRouteProviderSuite extends RouteSpec with UserFixture {
 
   private val userService  = mock[UserService[Future]]
   private val tokenService = mock[TokenService]
@@ -23,8 +23,8 @@ class UserRouteProviderSpec extends RouteSpec with UserFixture {
     userService.authenticateUser(UserFixture.Email, UserFixture.PlainTextPassword) returns Future.successful(Right(userWithToken))
 
     Post("/users/login", httpEntity(userAuthenticationDto)) ~> userRoute ~> check {
-      status shouldBe StatusCodes.OK
-      responseAs[UserDto] shouldBe savedUserDto
+      status shouldEqual StatusCodes.OK
+      responseAs[UserDto] shouldEqual savedUserDto
     }
   }
 
@@ -32,28 +32,28 @@ class UserRouteProviderSpec extends RouteSpec with UserFixture {
     userService.createUser(newUser) returns Future.successful(userWithToken)
 
     Post("/users", httpEntity(userRegistrationDto)) ~> userRoute ~> check {
-      status shouldBe StatusCodes.OK
-      responseAs[UserDto] shouldBe savedUserDto
+      status shouldEqual StatusCodes.OK
+      responseAs[UserDto] shouldEqual savedUserDto
     }
   }
 
   it should "get current user" in {
-    userService.getUserById(UserFixture.Id) returns Future.successful(Right(savedUser))
+    userService.getUserById(UserFixture.Id) returns Future.successful(Right(userWithToken))
     tokenService.validateToken(UserFixture.ValidSecurityToken) returns Right(userPrincipalWithToken)
 
-    Get("/users") ~> AuthorizationHeader(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
-      status shouldBe StatusCodes.OK
-      responseAs[UserDto] shouldBe savedUserDto
+    Get("/users") ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[UserDto] shouldEqual savedUserDto
     }
   }
 
   it should "update user" in {
-    userService.updateUser(UserFixture.Id, updateUser) returns Future.successful(Right(savedUserAfterUpdate))
+    userService.updateUser(UserFixture.Id, updateUser) returns Future.successful(Right(userWithTokenAfterUpdate))
     tokenService.validateToken(UserFixture.ValidSecurityToken) returns Right(userPrincipalWithToken)
 
-    Put("/users", httpEntity(userUpdateDto)) ~> AuthorizationHeader(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
-      status shouldBe StatusCodes.OK
-      responseAs[UserDto] shouldBe savedUserAfterUpdateDto
+    Put("/users", httpEntity(userUpdateDto)) ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[UserDto] shouldEqual savedUserAfterUpdateDto
     }
   }
 }

@@ -1,17 +1,18 @@
 package com.melalex.realworld
 package users.dto
 
-import commons.errors.model.RealWorldError.{AboveMax, BelowMin, RegExMismatch}
+import commons.errors.model.RealWorldError.{AboveMax, RegExMismatch}
 import commons.validation.RealWorldValidation
-import fixture.{RealWorldSpec, UserFixture}
+import test.fixture.UserFixture
+import test.spec.UnitTestSpec
 import users.model.User
 
 import cats.data.Validated.{Valid, invalidNec}
 
-class UserUpdateDtoSpec extends RealWorldSpec with RealWorldValidation with UserFixture {
+class UserUpdateDtoSuite extends UnitTestSpec with RealWorldValidation with UserFixture {
 
   "UserUpdateDto.formValidation" should "return itself for valid UserUpdateDto" in {
-    validationResult(userUpdateDto) shouldBe Valid(userUpdateDto)
+    validationResult(userUpdateDto) shouldEqual Valid(userUpdateDto)
   }
 
   it should "return Invalid when email doesn't match pattern" in {
@@ -21,7 +22,7 @@ class UserUpdateDtoSpec extends RealWorldSpec with RealWorldValidation with User
       )
     )
 
-    validationResult(target) shouldBe invalidNec(RegExMismatch(User.Email.messageKey, RealWorldValidation.EmailRegEx))
+    validationResult(target) shouldEqual invalidNec(RegExMismatch(User.Email.messageKey, RealWorldValidation.EmailRegEx))
   }
 
   it should "return Invalid when bio is bigger than 250" in {
@@ -31,7 +32,7 @@ class UserUpdateDtoSpec extends RealWorldSpec with RealWorldValidation with User
       )
     )
 
-    validationResult(target) shouldBe invalidNec(AboveMax(User.Bio.messageKey, 250))
+    validationResult(target) shouldEqual invalidNec(AboveMax(User.Bio.messageKey, 250))
   }
 
   it should "return Invalid when image is bigger than 250" in {
@@ -41,6 +42,6 @@ class UserUpdateDtoSpec extends RealWorldSpec with RealWorldValidation with User
       )
     )
 
-    validationResult(target) shouldBe invalidNec(AboveMax(User.Image.messageKey, 400))
+    validationResult(target) shouldEqual invalidNec(AboveMax(User.Image.messageKey, 400))
   }
 }

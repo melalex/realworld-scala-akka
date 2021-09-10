@@ -5,7 +5,8 @@ import commons.errors.dto.RealWorldErrorDto
 import commons.errors.mappers.RealWorldErrorConversions
 import commons.errors.model._
 import commons.web.RouteProvider
-import fixture.{PropertiesFixture, RouteSpec}
+import test.fixture.PropertiesFixture
+import test.spec.RouteSpec
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Language, `Accept-Language`}
@@ -14,7 +15,7 @@ import org.mockito.ArgumentMatchersSugar
 
 import java.util.Locale
 
-class CompositeRouteProviderSpec extends RouteSpec with PropertiesFixture with ArgumentMatchersSugar with Directives {
+class CompositeRouteProviderSuite extends RouteSpec with PropertiesFixture with ArgumentMatchersSugar with Directives {
 
   private implicit val locale: Locale = Locale.ENGLISH
 
@@ -34,7 +35,7 @@ class CompositeRouteProviderSpec extends RouteSpec with PropertiesFixture with A
       failWith(NotFoundException(Seq()))
     }
 
-    Get()~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
+    Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
       status shouldEqual StatusCodes.NotFound
     }
   }

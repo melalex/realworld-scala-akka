@@ -11,7 +11,7 @@ trait PureConfigComponents {
 
   implicit val configSource: ConfigObjectSource = ConfigSource.default
 
-  val config: Config = ConfigFactory.load()
+  def config: Config = ConfigFactory.load()
 
   implicit def exportReader[A]: Exported[ConfigReader[A]] =
     macro ExportMacros.exportDerivedReader[A]

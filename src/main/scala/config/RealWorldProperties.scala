@@ -2,6 +2,7 @@ package com.melalex.realworld
 package config
 
 import java.time.Duration
+import scala.concurrent.duration.FiniteDuration
 
 case class RealWorldProperties(
     server: ServerProperties,
@@ -15,7 +16,7 @@ case class ServerProperties(
 )
 
 case class SessionProperties(
-    ttl: Duration,
-    jwtSecretKey: String,
-    jwtIssuer: String
+                              ttl: FiniteDuration,
+                              jwtSecretKey: String,
+                              jwtIssuer: String
 )

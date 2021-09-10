@@ -1,13 +1,13 @@
 package com.melalex.realworld
 package commons.i18n.service.impl
 
-import fixture.RealWorldSpec
+import test.spec.UnitTestSpec
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 import java.util.Locale
 
-class ResourceBundleI18nServiceSpec extends RealWorldSpec with TableDrivenPropertyChecks {
+class ResourceBundleI18nServiceSuite extends UnitTestSpec with TableDrivenPropertyChecks {
 
   private case class MessageBlueprint(key: String, args: String*)
 
@@ -37,7 +37,9 @@ class ResourceBundleI18nServiceSpec extends RealWorldSpec with TableDrivenProper
 
   private val resourceBundleI18nService = new ResourceBundleI18nService()
 
-  forAll(messageBlueprints) { (blueprint, expected) =>
-    resourceBundleI18nService.getMessage(blueprint.key, blueprint.args: _*) shouldBe expected
+  "ResourceBundleI18nService" should "provide translation for keys and arguments" in {
+    forAll(messageBlueprints) { (blueprint, expected) =>
+      resourceBundleI18nService.getMessage(blueprint.key, blueprint.args: _*) shouldEqual expected
+    }
   }
 }

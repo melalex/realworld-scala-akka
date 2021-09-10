@@ -46,11 +46,10 @@ class UserRouteProvider(
           }
         }
     } ~
-      authenticated(tokenService) { auth =>
-        pathEndOrSingleSlash {
+      pathEndOrSingleSlash {
+        authenticated(tokenService) { auth =>
           get {
             val response = EitherT(userService.getUserById(auth.principal.id))
-              .map(_.withToken(auth.token))
               .map(UserConversions.toUserDto)
 
             completeEitherT(response)
@@ -58,7 +57,6 @@ class UserRouteProvider(
             put {
               entity(as[UserUpdateDto].validate) { update =>
                 val response = EitherT(userService.updateUser(auth.principal.id, UserConversions.toUserUpdate(update)))
-                  .map(_.withToken(auth.token))
                   .map(UserConversions.toUserDto)
 
                 completeEitherT(response)

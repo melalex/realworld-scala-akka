@@ -1,9 +1,9 @@
 package com.melalex.realworld
 package users.service
 
-import commons.errors.model.{NotFoundException, CredentialsException}
+import commons.errors.model.{CredentialsException, NotFoundException}
 import commons.model.ModelId
-import users.model.{NewUser, SavedUser, UpdateUser, UserWithToken}
+import users.model.{NewUser, UpdateUser, UserWithToken}
 
 trait UserService[F[_]] {
 
@@ -11,7 +11,7 @@ trait UserService[F[_]] {
 
   def createUser(newUser: NewUser): F[UserWithToken]
 
-  def updateUser(id: ModelId, updateUser: UpdateUser): F[Either[NotFoundException, SavedUser]]
+  def updateUser(id: ModelId, updateUser: UpdateUser): F[Either[NotFoundException, UserWithToken]]
 
-  def getUserById(id: ModelId): F[Either[NotFoundException, SavedUser]]
+  def getUserById(id: ModelId): F[Either[NotFoundException, UserWithToken]]
 }
