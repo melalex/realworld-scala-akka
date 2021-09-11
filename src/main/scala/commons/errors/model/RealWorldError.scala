@@ -45,10 +45,15 @@ object RealWorldError extends MessageKeys {
     override val messageCode = s"$ErrorPrefix.credentials.invalid"
   }
 
-  final case class NotFound[A: TypeTag](id: ModelId) extends RealWorldError {
+  final case class NotFound[A: TypeTag](id: String) extends RealWorldError {
 
     override val messageCode: String    = s"$ErrorPrefix.notFound"
-    override val arguments: Seq[String] = Seq(modelKey[A], id.value.toString)
+    override val arguments: Seq[String] = Seq(modelKey[A], id)
+  }
+
+  object NotFound {
+
+    def apply[A: TypeTag](id: ModelId): NotFound[A] = NotFound(id.value.toString)
   }
 
   final case class EmptyField(fieldName: String) extends RealWorldError {

@@ -1,6 +1,8 @@
 package com.melalex.realworld
 package config
 
+import articles.ArticleComponents
+import comments.CommentComponents
 import commons.CommonComponents
 import commons.auth.AuthComponents
 import commons.db.{DBIOInstances, DbComponents, DbInitRequired}
@@ -8,6 +10,8 @@ import commons.errors.ErrorComponents
 import commons.i18n.I18nComponents
 import commons.web.RouteProvider
 import commons.web.impl.CompositeRouteProvider
+import profiles.ProfileComponents
+import tags.TagComponents
 import users.UserComponents
 
 import akka.http.scaladsl.server.Directives.pathPrefix
@@ -16,11 +20,13 @@ import cats.instances.FutureInstances
 import com.softwaremill.macwire.{wire, wireSet}
 import slick.dbio.DBIO
 
-import java.time.Clock
-
 trait AppComponents
     extends PureConfigComponents
     with UserComponents
+    with ProfileComponents
+    with ArticleComponents
+    with TagComponents
+    with CommentComponents
     with I18nComponents
     with ErrorComponents
     with DbComponents

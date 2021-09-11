@@ -3,25 +3,44 @@ package profiles.route
 
 import commons.auth.service.TokenService
 import commons.web.RouteProvider
+import profiles.mapper.ProfileConversions
+import profiles.service.ProfileService
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
+import cats.data.EitherT
+import cats.implicits._
+import io.circe.generic.auto._
 
-class ProfileRouteProvider(tokenService: TokenService) extends RouteProvider {
+import scala.concurrent.{ExecutionContext, Future}
+
+class ProfileRouteProvider(
+    tokenService: TokenService,
+    profileService: ProfileService[Future]
+)(implicit ec: ExecutionContext)
+    extends RouteProvider {
 
   override def provideRoute: Route = pathPrefix("profiles" / Segment) { username =>
     get {
       maybeAuthenticated(tokenService) { auth =>
-        complete(StatusCodes.OK)
+        val response = EitherT(profileService.getByUsername(auth.id, username))
+          .map(ProfileConversions.toDto)
+
+        completeEitherT(response)
       }
     }
     path("follow") {
       authenticated(tokenService) { auth =>
         post {
-          complete(StatusCodes.OK)
+          val response = EitherT(profileService.follow(auth.id, username))
+            .map(ProfileConversions.toDto)
+
+          completeEitherT(response)
         }
         delete {
-          complete(StatusCodes.OK)
+          val response = EitherT(profileService.unfollow(auth.id, username))
+            .map(ProfileConversions.toDto)
+
+          completeEitherT(response)
         }
       }
     }

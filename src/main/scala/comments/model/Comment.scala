@@ -12,6 +12,7 @@ trait Comment {
   val updatedAt: Instant
   val body: String
   val authorId: ModelId
+  val articleId: ModelId
 }
 
 case class SavedComment(
@@ -19,7 +20,8 @@ case class SavedComment(
     createdAt: Instant,
     updatedAt: Instant,
     body: String,
-    author: SavedUser
+    author: SavedUser,
+    articleId: ModelId
 ) extends Comment {
 
   override val authorId: ModelId = author.id
@@ -29,5 +31,6 @@ case class UnsavedComment(
     createdAt: Instant,
     updatedAt: Instant,
     body: String,
-    authorId: ModelId
+    authorId: ModelId,
+    articleId: ModelId
 ) extends Comment

@@ -10,8 +10,6 @@ import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives._
 
-import java.nio.file.attribute.UserPrincipal
-
 trait TokenAuthorizationDirectives {
 
   def authenticated(tokenService: TokenService): Directive1[ActualUserPrincipal] =
