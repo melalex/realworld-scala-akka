@@ -41,7 +41,7 @@ class UserRouteProviderSuite extends RouteSpec with UserFixture {
     userService.getUserById(UserFixture.Id) returns Future.successful(Right(userWithToken))
     tokenService.validateToken(UserFixture.ValidSecurityToken) returns Right(userPrincipalWithToken)
 
-    Get("/users") ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
+    Get("/user") ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[UserDto] shouldEqual savedUserDto
     }
@@ -51,7 +51,7 @@ class UserRouteProviderSuite extends RouteSpec with UserFixture {
     userService.updateUser(UserFixture.Id, updateUser) returns Future.successful(Right(userWithTokenAfterUpdate))
     tokenService.validateToken(UserFixture.ValidSecurityToken) returns Right(userPrincipalWithToken)
 
-    Put("/users", httpEntity(userUpdateDto)) ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
+    Put("/user", httpEntity(userUpdateDto)) ~> authorization(UserFixture.ValidSecurityToken) ~> userRoute ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[UserDto] shouldEqual savedUserAfterUpdateDto
     }

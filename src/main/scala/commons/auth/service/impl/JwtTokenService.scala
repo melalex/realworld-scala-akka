@@ -1,7 +1,7 @@
 package com.melalex.realworld
 package commons.auth.service.impl
 
-import commons.auth.model.{ActualUserPrincipal, SecurityToken, UserPrincipalWithToken}
+import commons.auth.model.{ActualUserPrincipal, SecurityToken}
 import commons.auth.service.TokenService
 import commons.errors.model.{CredentialsException, RealWorldError}
 import commons.util.JavaConversions
@@ -17,12 +17,11 @@ import java.time.Instant
 
 class JwtTokenService(realWorldProperties: RealWorldProperties, jwtCirce: JwtCirce) extends TokenService with JavaConversions {
 
-  override def validateToken(token: SecurityToken): Either[CredentialsException, UserPrincipalWithToken] =
+  override def validateToken(token: SecurityToken): Either[CredentialsException, ActualUserPrincipal] =
     jwtCirce
       .decode(token.value, realWorldProperties.session.jwtSecretKey, Seq(JwtTokenService.EncodingAlgorithm))
       .toEither
       .flatMap(it => decode[ActualUserPrincipal](it.content))
-      .map(UserPrincipalWithToken(_, token))
       .left
       .map(ex => CredentialsException(Seq(RealWorldError.InvalidToken), ex))
 

@@ -1,13 +1,13 @@
 package com.melalex.realworld
 package commons.auth.service
 
-import commons.auth.model.{ActualUserPrincipal, SecurityToken, UserPrincipalWithToken}
+import commons.auth.model.{ActualUserPrincipal, SecurityToken}
 import commons.errors.model.CredentialsException
 import users.model.{SavedUser, UserWithToken}
 
 trait TokenService {
 
-  def validateToken(token: SecurityToken): Either[CredentialsException, UserPrincipalWithToken]
+  def validateToken(token: SecurityToken): Either[CredentialsException, ActualUserPrincipal]
 
   def generateNewToken(principal: ActualUserPrincipal): SecurityToken
 }

@@ -17,7 +17,7 @@ class UserFeatures extends IntegrationTestSpec with UserFixture {
   Feature("User registration") {
     Scenario("Successfully register new user") {
       Given("Anonymous user")
-      When("Client calls POST '/users' with valid registration form data")
+      When("Client calls POST '/user' with valid registration form data")
       Post("/api/users", httpEntity(userRegistrationDto)) ~!> routes ~> isOk
 
       Then("Client able to to login")
@@ -27,7 +27,7 @@ class UserFeatures extends IntegrationTestSpec with UserFixture {
       }
 
       And("Get current user")
-      Get("/api/users").withHeaders(authorization(authenticatedUser.user.token)) ~!> routes ~> check {
+      Get("/api/user").withHeaders(authorization(authenticatedUser.user.token)) ~!> routes ~> check {
         status shouldEqual StatusCodes.OK
         responseAs[UserDto] should equal(savedUserDto)(after being unTokenized)
       }
@@ -48,14 +48,14 @@ class UserFeatures extends IntegrationTestSpec with UserFixture {
         }
 
         When("Update user")
-        val updateRequest = Put("/api/users", httpEntity(userUpdateDto)).withHeaders(authorization(authenticatedUser.user.token))
+        val updateRequest = Put("/api/user", httpEntity(userUpdateDto)).withHeaders(authorization(authenticatedUser.user.token))
         val userAfterUpdate = updateRequest ~!> routes ~> check {
           status shouldEqual StatusCodes.OK
           responseAs[UserDto]
         }
 
         Then("Current user info equals to updated one")
-        Get("/api/users").withHeaders(authorization(userAfterUpdate.user.token)) ~!> routes ~> check {
+        Get("/api/user").withHeaders(authorization(userAfterUpdate.user.token)) ~!> routes ~> check {
           status shouldEqual StatusCodes.OK
           responseAs[UserDto] should equal(savedUserAfterUpdateDto)(after being unTokenized)
         }

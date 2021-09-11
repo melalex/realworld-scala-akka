@@ -7,7 +7,7 @@ case class ModelId(value: Long) extends AnyVal
 
 object ModelId {
 
-  val UnSaved: ModelId = ModelId(-1)
+  val UnSaved: ModelId = ModelId(0)
 
   implicit val ModelIdMapping: BaseColumnType[ModelId] =
     MappedColumnType.base[ModelId, Long](

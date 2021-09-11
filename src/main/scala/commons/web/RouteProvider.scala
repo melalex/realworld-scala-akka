@@ -1,9 +1,20 @@
 package com.melalex.realworld
 package commons.web
 
-import akka.http.scaladsl.server.Route
+import commons.auth.web.TokenAuthorizationDirectives
+import commons.validation.web.ValidationDirectives
 
-trait RouteProvider {
+import akka.http.scaladsl.server.directives.FutureDirectives
+import akka.http.scaladsl.server.{Directives, Route}
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+
+trait RouteProvider
+    extends Directives
+    with FailFastCirceSupport
+    with FutureDirectives
+    with RealWorldDirectives
+    with TokenAuthorizationDirectives
+    with ValidationDirectives {
 
   def provideRoute: Route
 }

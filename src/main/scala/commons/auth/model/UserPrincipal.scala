@@ -5,6 +5,7 @@ import commons.model.ModelId
 
 sealed trait UserPrincipal {
 
+  val id: ModelId
   val email: String
   val username: String
   val authenticated: Boolean
@@ -21,6 +22,7 @@ case class ActualUserPrincipal(
 
 object AnonymousUserPrincipal extends UserPrincipal {
 
+  override val id: ModelId            = ModelId.UnSaved
   override val email: String          = "anon@example.com"
   override val username: String       = "Anon"
   override val authenticated: Boolean = false
