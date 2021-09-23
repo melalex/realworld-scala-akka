@@ -1,5 +1,5 @@
 package com.melalex.realworld
-package users.model
+package articles.model
 
 import commons.model.ModelId
 

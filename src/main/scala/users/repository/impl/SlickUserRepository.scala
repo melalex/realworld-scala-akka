@@ -23,9 +23,25 @@ class SlickUserRepository(
     with Droppable[DBIO]
     with DBIOInstances {
 
-  override def init(): DBIO[Unit] = Users.schema.createIfNotExists
+  override def init(): DBIO[Unit] =
+    DBIO
+      .sequence(
+        Seq(
+          Users.schema.createIfNotExists,
+          UserToUserRelations.schema.createIfNotExists
+        )
+      )
+      .map(_ => ())
 
-  override def drop(): DBIO[Unit] = Users.schema.dropIfExists
+  override def drop(): DBIO[Unit] =
+    DBIO
+      .sequence(
+        Seq(
+          Users.schema.dropIfExists,
+          UserToUserRelations.schema.dropIfExists
+        )
+      )
+      .map(_ => ())
 
   override def save(user: User): DBIO[SavedUser] = user match {
     case it: SavedUser   => Users.update(it).map(_ => it)
@@ -59,15 +75,17 @@ class SlickUserRepository(
       .result
       .headOption
 
-  override def findByUsername(username: String, followerId: ModelId): DBIO[Option[Profile]] = {
-    val join = for {
-      (user, relation) <- Users joinLeft UserToUserRelations on ((u, r) => u.id === r.followingId && r.followerId === followerId)
-      if user.username === username
-    } yield (user, relation)
+  override def findByUsername(username: String, callerId: ModelId): DBIO[Option[Profile]] = {
+    def findByUsernameInternal(): DBIO[Option[(SavedUser, Option[UserToUserRelation])]] = {
+      val join = for {
+        (user, relation) <- Users joinLeft UserToUserRelations on ((u, r) => u.id === r.followingId && r.followerId === callerId)
+        if user.username === username
+      } yield (user, relation)
 
-    val result: DBIO[Option[(SavedUser, Option[UserToUserRelation])]] = join.result.headOption
+      join.result.headOption
+    }
 
-    OptionT(result).map {
+    OptionT(findByUsernameInternal()).map {
       case (user, maybeRelation) => Profile(user.username, user.bio, user.image, maybeRelation.isDefined)
     }.value
   }
@@ -105,6 +123,7 @@ object SlickUserRepository {
 
     def followerId  = column[ModelId]("follower_id")
     def followingId = column[ModelId]("following_id")
+
     def pk          = primaryKey("pk_user_to_user", (followerId, followingId))
     def follower    = foreignKey("fk_follower", followerId, Users)(_.id, onDelete = ForeignKeyAction.Cascade)
     def following   = foreignKey("fk_following", followingId, Users)(_.id, onDelete = ForeignKeyAction.Cascade)

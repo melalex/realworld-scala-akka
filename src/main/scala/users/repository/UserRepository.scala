@@ -17,7 +17,9 @@ trait UserRepository[DB[_]] {
 
   def findByUsername(username: String): DB[Option[SavedUser]]
 
-  def findByUsername(username: String, followerId: ModelId): DB[Option[Profile]]
+  def findByUsername(username: String, callerId: ModelId): DB[Option[Profile]]
 
   def findById(id: ModelId): DB[Option[SavedUser]]
+
+  def findById(id: ModelId, callerId: ModelId): DB[Option[Profile]]
 }
