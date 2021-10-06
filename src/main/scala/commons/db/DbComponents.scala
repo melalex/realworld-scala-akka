@@ -17,7 +17,7 @@ trait DbComponents { self: FutureInstances =>
   implicit def executor: ExecutionContext
 
   lazy val dbInterpreter: DbInterpreter[Future, DBIO] = wire[SlickToFutureDbInterpreter]
-  lazy val dbBootstrap: DbBootstrap[Future, DBIO]     = wire[DbBootstrap[Future, DBIO]]
+  lazy val dbBootstrap: DbBootstrap[Future]           = wire[DbBootstrap[Future]]
 
   private[db] lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("mysql", config)
 }

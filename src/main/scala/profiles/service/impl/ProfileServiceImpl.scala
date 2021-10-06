@@ -1,11 +1,12 @@
 package com.melalex.realworld
 package profiles.service.impl
 
+import commons.auth.model.{ActualUserPrincipal, UserPrincipal}
 import commons.db.DbInterpreter
 import commons.errors.model.{NotFoundException, RealWorldError}
-import commons.model.ModelId
 import profiles.model.Profile
 import profiles.service.ProfileService
+import users.model.Username
 import users.repository.UserRepository
 
 import cats.Monad
@@ -16,38 +17,39 @@ class ProfileServiceImpl[F[_]: Monad, DB[_]: Monad](
     dbInterpreter: DbInterpreter[F, DB]
 ) extends ProfileService[F] {
 
-  override def follow(followerId: ModelId, followingUsername: String): F[Either[NotFoundException, Profile]] = {
+  override def follow(
+      followingUsername: Username
+  )(implicit user: ActualUserPrincipal): F[Either[NotFoundException, Profile]] = {
     val unitOfWork = for {
-      _         <- getUserById(followerId)
+      follower  <- getUserByName(user.username)
       following <- getUserByName(followingUsername)
-      _         <- EitherT.right(userRepository.createRelation(followerId, following.id))
-    } yield Profile(following.username, following.bio, following.image, following = true)
+      _         <- EitherT.right[NotFoundException](userRepository.createRelation(follower.id, following.id))
+    } yield Profile(following.id, following.username, following.bio, following.image, following = true)
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
   }
 
-  override def unfollow(followerId: ModelId, followingUsername: String): F[Either[NotFoundException, Profile]] = {
+  override def unfollow(
+      followingUsername: Username
+  )(implicit user: ActualUserPrincipal): F[Either[NotFoundException, Profile]] = {
     val unitOfWork = for {
-      _         <- getUserById(followerId)
+      follower  <- getUserByName(user.username)
       following <- getUserByName(followingUsername)
-      _         <- EitherT.right(userRepository.deleteRelation(followerId, following.id))
-    } yield Profile(following.username, following.bio, following.image, following = false)
+      _         <- EitherT.right[NotFoundException](userRepository.deleteRelation(follower.id, following.id))
+    } yield Profile(following.id, following.username, following.bio, following.image, following = false)
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
   }
 
-  override def getByUsername(followerId: ModelId, followingUsername: String): F[Either[NotFoundException, Profile]] = {
-    val unitOfWork = OptionT(userRepository.findByUsername(followingUsername, followerId))
-      .toRight(RealWorldError.NotFound(followingUsername).ex[NotFoundException])
+  override def getByUsername(
+      followingUsername: Username
+  )(implicit user: UserPrincipal): F[Either[NotFoundException, Profile]] = {
+    val unitOfWork = OptionT(userRepository.findByUsername(followingUsername, user.id))
+      .toRight(RealWorldError.NotFound(followingUsername.value).ex[NotFoundException])
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
   }
 
-  private def getUserByName(followingUsername: String) =
-    OptionT(userRepository.findByUsername(followingUsername))
-      .toRight(RealWorldError.NotFound(followingUsername).ex[NotFoundException])
-
-  private def getUserById(followerId: ModelId) =
-    OptionT(userRepository.findById(followerId))
-      .toRight(RealWorldError.NotFound(followerId).ex[NotFoundException])
+  private def getUserByName(followingUsername: Username) = OptionT(userRepository.findByUsername(followingUsername))
+    .toRight(RealWorldError.NotFound(followingUsername.value).ex[NotFoundException])
 }

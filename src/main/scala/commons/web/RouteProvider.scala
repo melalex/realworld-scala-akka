@@ -14,7 +14,8 @@ trait RouteProvider
     with FutureDirectives
     with RealWorldDirectives
     with TokenAuthorizationDirectives
-    with ValidationDirectives {
+    with ValidationDirectives
+    with MorePathMatchers {
 
   def provideRoute: Route
 }

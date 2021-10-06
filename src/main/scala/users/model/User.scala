@@ -2,14 +2,14 @@ package com.melalex.realworld
 package users.model
 
 import commons.auth.model.{ActualUserPrincipal, SecurityToken}
-import commons.model.{FieldName, ModelId}
+import commons.model.{Email, FieldName, ModelId}
 
 import java.time.Instant
 
 sealed trait User {
 
-  val email: String
-  val username: String
+  val email: Email
+  val username: Username
   val password: PasswordHash
   val createdAt: Instant
   val updatedAt: Instant
@@ -17,8 +17,8 @@ sealed trait User {
 
 case class SavedUser(
     id: ModelId,
-    email: String,
-    username: String,
+    email: Email,
+    username: Username,
     password: PasswordHash,
     bio: Option[String],
     image: Option[String],
@@ -27,8 +27,8 @@ case class SavedUser(
 ) extends User
 
 case class UnsavedUser(
-    email: String,
-    username: String,
+    email: Email,
+    username: Username,
     password: PasswordHash,
     createdAt: Instant,
     updatedAt: Instant

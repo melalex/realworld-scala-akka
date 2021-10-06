@@ -1,6 +1,7 @@
 package com.melalex.realworld
 package users.service
 
+import commons.model.Email
 import users.model._
 
 import java.time.{Clock, Instant}
@@ -14,8 +15,8 @@ class UserFactory(
     val now = Instant.now(clock)
 
     UnsavedUser(
-      email = newUser.email,
-      username = newUser.username,
+      email = Email(newUser.email),
+      username = Username(newUser.username),
       password = passwordHashService.hash(newUser.password),
       createdAt = now,
       updatedAt = now
@@ -23,7 +24,7 @@ class UserFactory(
   }
 
   def createUpdatedUser(user: SavedUser, updateUser: UpdateUser): SavedUser = user.copy(
-    email = updateUser.email,
+    email = Email(updateUser.email),
     bio = updateUser.bio,
     image = updateUser.image,
     updatedAt = Instant.now(clock)

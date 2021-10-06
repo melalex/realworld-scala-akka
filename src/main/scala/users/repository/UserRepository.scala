@@ -1,9 +1,9 @@
 package com.melalex.realworld
 package users.repository
 
-import commons.model.ModelId
+import commons.model.{Email, ModelId}
 import profiles.model.Profile
-import users.model.{SavedUser, User, UserToUserRelation}
+import users.model.{SavedUser, User, UserToUserRelation, Username}
 
 trait UserRepository[DB[_]] {
 
@@ -13,13 +13,9 @@ trait UserRepository[DB[_]] {
 
   def deleteRelation(followerId: ModelId, followingId: ModelId): DB[Unit]
 
-  def findByEmail(email: String): DB[Option[SavedUser]]
+  def findByEmail(email: Email): DB[Option[SavedUser]]
 
-  def findByUsername(username: String): DB[Option[SavedUser]]
+  def findByUsername(username: Username): DB[Option[SavedUser]]
 
-  def findByUsername(username: String, callerId: ModelId): DB[Option[Profile]]
-
-  def findById(id: ModelId): DB[Option[SavedUser]]
-
-  def findById(id: ModelId, callerId: ModelId): DB[Option[Profile]]
+  def findByUsername(username: Username, callerId: ModelId): DB[Option[Profile]]
 }

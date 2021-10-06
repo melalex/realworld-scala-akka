@@ -1,7 +1,7 @@
 package com.melalex.realworld
 package commons.auth.service.impl
 
-import commons.auth.model.{SecurityToken, UserPrincipalWithToken}
+import commons.auth.model.SecurityToken
 import commons.errors.model.RealWorldError
 import test.fixture.{PropertiesFixture, UserFixture}
 import test.spec.UnitTestSpec
@@ -17,7 +17,7 @@ class JwtTokenServiceSuite extends UnitTestSpec with PropertiesFixture with User
   "verifyToken" should "return UserPrincipalWithToken for valid token" in {
     val userWithToken = jwtTokenService.generateNewTokenForUser(savedUser)
 
-    jwtTokenService.validateToken(userWithToken.token) shouldEqual Right(UserPrincipalWithToken(actualUserPrincipal, userWithToken.token))
+    jwtTokenService.validateToken(userWithToken.token) shouldEqual Right(actualUserPrincipal)
   }
 
   it should "return CredentialsException for invalid token" in {
@@ -31,6 +31,8 @@ class JwtTokenServiceSuite extends UnitTestSpec with PropertiesFixture with User
   }
 
   it should "return ValidSecurityTokenAfterUpdate" in {
-    jwtTokenService.generateNewToken(actualUserPrincipalAfterUpdate) shouldEqual UserFixture.ValidSecurityTokenAfterUpdate
+    jwtTokenService.generateNewToken(
+      actualUserPrincipalAfterUpdate
+    ) shouldEqual UserFixture.ValidSecurityTokenAfterUpdate
   }
 }

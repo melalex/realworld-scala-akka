@@ -21,8 +21,8 @@ trait RepositorySpec extends UnitTestSpec with DatabaseTestContainer with Future
   lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("mysql", config)
 
   lazy val dbInterpreter: DbInterpreter[Future, DBIO] = wire[SlickToFutureDbInterpreter]
-  lazy val dbBootstrap: DbBootstrap[Future, DBIO]     = wire[DbBootstrap[Future, DBIO]]
+  lazy val dbBootstrap: DbBootstrap[Future]           = wire[DbBootstrap[Future]]
 
-  def setUp(initRequired: DbInitRequired[DBIO]*): Unit = Await.ready(dbBootstrap.init(initRequired), 5 seconds)
-  def tearDown(droppable: Droppable[DBIO]*): Unit      = Await.ready(dbBootstrap.drop(droppable), 5 seconds)
+  override protected def beforeEach(): Unit = Await.ready(dbBootstrap.init(), 5 seconds)
+  override protected def afterEach(): Unit  = Await.ready(dbBootstrap.drop(), 5 seconds)
 }

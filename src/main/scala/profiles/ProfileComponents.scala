@@ -1,11 +1,12 @@
 package com.melalex.realworld
 package profiles
 
-import commons.db.DBIOInstances
-import profiles.service.ProfileService
+import commons.auth.service.TokenService
+import commons.db.{DBIOInstances, DbInterpreter}
+import profiles.mapper.ProfileMapper
+import profiles.route.ProfileRouteProvider
 import profiles.service.impl.ProfileServiceImpl
 import users.repository.UserRepository
-import users.route.UserRouteProvider
 
 import cats.instances.FutureInstances
 import com.softwaremill.macwire.wire
@@ -16,9 +17,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait ProfileComponents { self: FutureInstances with DBIOInstances =>
 
   def userRepository: UserRepository[DBIO]
+  def dbInterpreter: DbInterpreter[Future, DBIO]
+  def tokenService: TokenService
 
   implicit def executor: ExecutionContext
 
-  lazy val profileService: ProfileService[Future] = wire[ProfileServiceImpl[Future, DBIO]]
-  lazy val userRouteProvider: UserRouteProvider   = wire[UserRouteProvider]
+  lazy val profileRouteProvider: ProfileRouteProvider = wire[ProfileRouteProvider]
+  lazy val profileMapper: ProfileMapper               = wire[ProfileMapper]
+
+  private[profiles] lazy val profileService = wire[ProfileServiceImpl[Future, DBIO]]
 }

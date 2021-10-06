@@ -7,5 +7,5 @@ case class ModelId(value: Long) extends AnyVal
 
 object ModelId {
 
-  val UnSaved: ModelId = ModelId(0)
+  val Unsaved: ModelId = ModelId(0)
 }

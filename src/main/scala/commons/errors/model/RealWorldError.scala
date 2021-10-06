@@ -3,6 +3,7 @@ package commons.errors.model
 
 import commons.i18n.util.MessageKeys
 import commons.model.ModelId
+import users.model.Username
 
 import scala.reflect.runtime.universe._
 import scala.util.matching.Regex
@@ -17,10 +18,10 @@ object RealWorldError extends MessageKeys {
 
   type ExceptionFactory[A] = RealWorldError => A
 
-  implicit val securityFactory: ExceptionFactory[CredentialsException] = it => CredentialsException(Seq(it))
-  implicit val notFoundFactory: ExceptionFactory[NotFoundException]    = it => NotFoundException(Seq(it))
-  implicit val clientFactory: ExceptionFactory[ClientException]        = it => ClientException(Seq(it))
-  implicit val serverFactory: ExceptionFactory[ServerException]        = it => ServerException(Seq(it))
+  implicit val securityFactory: ExceptionFactory[SecurityException] = it => SecurityException(Seq(it))
+  implicit val notFoundFactory: ExceptionFactory[NotFoundException] = it => NotFoundException(Seq(it))
+  implicit val clientFactory: ExceptionFactory[ClientException]     = it => ClientException(Seq(it))
+  implicit val serverFactory: ExceptionFactory[ServerException]     = it => ServerException(Seq(it))
 
   private val ErrorPrefix           = "error"
   private val ValidationErrorPrefix = ErrorPrefix + ".validation"
@@ -43,6 +44,12 @@ object RealWorldError extends MessageKeys {
   object InvalidCredentials extends RealWorldError {
 
     override val messageCode = s"$ErrorPrefix.credentials.invalid"
+  }
+
+  final case class InsufficientAccess(username: Username) extends RealWorldError {
+
+    override val messageCode: String    = s"$ErrorPrefix.access.insufficient"
+    override val arguments: Seq[String] = Seq(username.value)
   }
 
   final case class NotFound[A: TypeTag](id: String) extends RealWorldError {

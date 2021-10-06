@@ -3,28 +3,40 @@ package commons.db
 
 import cats.Monad
 import cats.implicits._
+import slick.dbio.DBIO
+import slick.jdbc.MySQLProfile.api.{DBIO => _, MappedTo => _, Rep => _, TableQuery => _, _}
 
-class DbBootstrap[F[_]: Monad, DB[_]](dbInterpreter: DbInterpreter[F, DB]) {
+class DbBootstrap[F[_]: Monad](dbInterpreter: DbInterpreter[F, DBIO]) extends SlickInstances {
 
-  def init(initRequired: DbInitRequired[DB]): F[Unit] = init(Seq(initRequired))
-
-  def init(initRequired: Seq[DbInitRequired[DB]]): F[Unit] =
-    dbInterpreter
-      .executeTransitionally(
-        dbInterpreter.sequence(
-          initRequired.map(_.init())
-        )
+  def init(): F[Unit] = {
+    val initScript = DBIO.sequence(
+      Seq(
+        users.schema.createIfNotExists,
+        articles.schema.createIfNotExists,
+        articleTags.schema.createIfNotExists,
+        comments.schema.createIfNotExists,
+        userToUser.schema.createIfNotExists,
+        userToArticle.schema.createIfNotExists,
+        articleToTag.schema.createIfNotExists
       )
-      .map(_ => ())
+    )
 
-  def drop(droppable: Droppable[DB]): F[Unit] = drop(Seq(droppable))
+    dbInterpreter.executeTransitionally(initScript).map(_ => ())
+  }
 
-  def drop(droppable: Seq[Droppable[DB]]): F[Unit] =
-    dbInterpreter
-      .executeTransitionally(
-        dbInterpreter.sequence(
-          droppable.map(_.drop())
-        )
+  def drop(): F[Unit] = {
+    val initScript = DBIO.sequence(
+      Seq(
+        articleToTag.schema.dropIfExists,
+        userToUser.schema.dropIfExists,
+        userToArticle.schema.dropIfExists,
+        comments.schema.dropIfExists,
+        articles.schema.dropIfExists,
+        articleTags.schema.dropIfExists,
+        users.schema.dropIfExists
       )
-      .map(_ => ())
+    )
+
+    dbInterpreter.executeTransitionally(initScript).map(_ => ())
+  }
 }

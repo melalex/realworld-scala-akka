@@ -10,7 +10,7 @@ case class ArticleDto(
     tittle: String,
     description: String,
     body: String,
-    tagList: List[String],
+    tagList: Seq[String],
     createdAt: ZonedDateTime,
     updatedAt: ZonedDateTime,
     favorite: Boolean,

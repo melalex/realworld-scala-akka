@@ -2,8 +2,8 @@ package com.melalex.realworld
 package articles.model
 
 import commons.model.ModelId
-import tags.model.{ArticleTag, SavedArticleTag}
-import users.model.SavedUser
+import profiles.model.Profile
+import tags.model.ArticleTag
 
 import java.time.Instant
 
@@ -13,7 +13,7 @@ trait Article {
   val tittle: String
   val description: String
   val body: String
-  val tagList: List[ArticleTag]
+  val tags: Set[ArticleTag]
   val authorId: ModelId
   val createdAt: Instant
   val updatedAt: Instant
@@ -25,8 +25,8 @@ case class SavedArticle(
     tittle: String,
     description: String,
     body: String,
-    tagList: List[SavedArticleTag],
-    author: SavedUser,
+    tags: Set[ArticleTag],
+    author: Profile,
     favorite: Boolean,
     favoritesCount: Int,
     createdAt: Instant,
@@ -41,7 +41,7 @@ case class UnsavedArticle(
     tittle: String,
     description: String,
     body: String,
-    tagList: List[ArticleTag],
+    tags: Set[ArticleTag],
     authorId: ModelId,
     updatedAt: Instant,
     createdAt: Instant

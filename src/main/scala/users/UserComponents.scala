@@ -4,6 +4,7 @@ package users
 import commons.auth.service.TokenService
 import commons.db.{DBIOInstances, DbInterpreter}
 import commons.web.RouteProvider
+import users.mapper.UserMapper
 import users.repository.impl.SlickUserRepository
 import users.route.UserRouteProvider
 import users.service.UserFactory
@@ -28,6 +29,7 @@ trait UserComponents { self: FutureInstances with DBIOInstances =>
   lazy val userService: UserServiceImpl[Future, DBIO] = wire[UserServiceImpl[Future, DBIO]]
   lazy val userRepository: SlickUserRepository        = wire[SlickUserRepository]
 
+  private[users] lazy val userMapper   = wire[UserMapper]
   private[users] lazy val passwordHash = wire[BCryptPasswordHashService]
   private[users] lazy val userFactory  = wire[UserFactory]
 }

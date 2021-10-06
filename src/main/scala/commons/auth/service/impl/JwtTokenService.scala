@@ -3,7 +3,7 @@ package commons.auth.service.impl
 
 import commons.auth.model.{ActualUserPrincipal, SecurityToken}
 import commons.auth.service.TokenService
-import commons.errors.model.{CredentialsException, RealWorldError}
+import commons.errors.model.{SecurityException, RealWorldError}
 import commons.util.JavaConversions
 import config.RealWorldProperties
 
@@ -17,13 +17,13 @@ import java.time.Instant
 
 class JwtTokenService(realWorldProperties: RealWorldProperties, jwtCirce: JwtCirce) extends TokenService with JavaConversions {
 
-  override def validateToken(token: SecurityToken): Either[CredentialsException, ActualUserPrincipal] =
+  override def validateToken(token: SecurityToken): Either[SecurityException, ActualUserPrincipal] =
     jwtCirce
       .decode(token.value, realWorldProperties.session.jwtSecretKey, Seq(JwtTokenService.EncodingAlgorithm))
       .toEither
       .flatMap(it => decode[ActualUserPrincipal](it.content))
       .left
-      .map(ex => CredentialsException(Seq(RealWorldError.InvalidToken), ex))
+      .map(ex => SecurityException(Seq(RealWorldError.InvalidToken), ex))
 
   override def generateNewToken(principal: ActualUserPrincipal): SecurityToken = {
     val now = Instant.now(jwtCirce.clock)

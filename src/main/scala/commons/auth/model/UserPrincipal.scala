@@ -1,20 +1,21 @@
 package com.melalex.realworld
 package commons.auth.model
 
-import commons.model.ModelId
+import commons.model.{Email, ModelId}
+import users.model.Username
 
 sealed trait UserPrincipal {
 
   val id: ModelId
-  val email: String
-  val username: String
+  val email: Email
+  val username: Username
   val authenticated: Boolean
 }
 
 case class ActualUserPrincipal(
     id: ModelId,
-    email: String,
-    username: String
+    email: Email,
+    username: Username
 ) extends UserPrincipal {
 
   override val authenticated: Boolean = true
@@ -22,8 +23,8 @@ case class ActualUserPrincipal(
 
 object AnonymousUserPrincipal extends UserPrincipal {
 
-  override val id: ModelId            = ModelId.UnSaved
-  override val email: String          = "anon@example.com"
-  override val username: String       = "Anon"
+  override val id: ModelId            = ModelId.Unsaved
+  override val email: Email           = Email("anon@example.com")
+  override val username: Username     = Username("Anon")
   override val authenticated: Boolean = false
 }

@@ -2,7 +2,7 @@ package com.melalex.realworld
 package comments.model
 
 import commons.model.ModelId
-import users.model.SavedUser
+import profiles.model.Profile
 
 import java.time.Instant
 
@@ -20,7 +20,7 @@ case class SavedComment(
     createdAt: Instant,
     updatedAt: Instant,
     body: String,
-    author: SavedUser,
+    author: Profile,
     articleId: ModelId
 ) extends Comment {
 

@@ -6,7 +6,7 @@ import profiles.dto.ProfileDto
 import java.time.ZonedDateTime
 
 case class CommentDto(
-    id: Int,
+    id: Long,
     createdAt: ZonedDateTime,
     updatedAt: ZonedDateTime,
     body: String,

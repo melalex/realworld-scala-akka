@@ -3,7 +3,7 @@ package profiles.route
 
 import commons.auth.service.TokenService
 import commons.web.RouteProvider
-import profiles.mapper.ProfileConversions
+import profiles.mapper.ProfileMapper
 import profiles.service.ProfileService
 
 import akka.http.scaladsl.server.Route
@@ -15,30 +15,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProfileRouteProvider(
     tokenService: TokenService,
-    profileService: ProfileService[Future]
+    profileService: ProfileService[Future],
+    profileMapper: ProfileMapper
 )(implicit ec: ExecutionContext)
     extends RouteProvider {
 
-  override def provideRoute: Route = pathPrefix("profiles" / Segment) { username =>
+  override def provideRoute: Route = pathPrefix("profiles" / usernameMatcher) { username =>
     get {
-      maybeAuthenticated(tokenService) { auth =>
-        val response = EitherT(profileService.getByUsername(auth.id, username))
-          .map(ProfileConversions.toDto)
+      maybeAuthenticated(tokenService) { implicit auth =>
+        val response = EitherT(profileService.getByUsername(username))
+          .map(profileMapper.map)
 
         completeEitherT(response)
       }
     }
     path("follow") {
-      authenticated(tokenService) { auth =>
+      authenticated(tokenService) { implicit auth =>
         post {
-          val response = EitherT(profileService.follow(auth.id, username))
-            .map(ProfileConversions.toDto)
+          val response = EitherT(profileService.follow(username))
+            .map(profileMapper.map)
 
           completeEitherT(response)
         }
         delete {
-          val response = EitherT(profileService.unfollow(auth.id, username))
-            .map(ProfileConversions.toDto)
+          val response = EitherT(profileService.unfollow(username))
+            .map(profileMapper.map)
 
           completeEitherT(response)
         }

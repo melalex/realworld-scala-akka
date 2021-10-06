@@ -4,11 +4,11 @@ package profiles.mapper
 import profiles.dto.ProfileDto
 import profiles.model.Profile
 
-object ProfileConversions {
+class ProfileMapper {
 
-  def toDto(source: Profile): ProfileDto = ProfileDto(
+  def map(source: Profile): ProfileDto = ProfileDto(
     ProfileDto.Body(
-      username = source.username,
+      username = source.username.value,
       bio = source.bio,
       image = source.image,
       following = source.following

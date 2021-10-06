@@ -36,7 +36,7 @@ class CompositeRouteProvider(
 
   private def exceptionHandler(implicit locale: Locale): ExceptionHandler = ExceptionHandler {
     case NotFoundException(errors, _)    => complete(NotFound, errorConversions.toDto(errors))
-    case CredentialsException(errors, _) => complete(Unauthorized, errorConversions.toDto(errors))
+    case SecurityException(errors, _) => complete(Unauthorized, errorConversions.toDto(errors))
     case ClientException(errors, _)      => complete(BadRequest, errorConversions.toDto(errors))
     case ServerException(errors, _)      => complete(InternalServerError, errorConversions.toDto(errors))
 

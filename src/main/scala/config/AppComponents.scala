@@ -5,7 +5,7 @@ import articles.ArticleComponents
 import comments.CommentComponents
 import commons.CommonComponents
 import commons.auth.AuthComponents
-import commons.db.{DBIOInstances, DbComponents, DbInitRequired}
+import commons.db.{DBIOInstances, DbComponents}
 import commons.errors.ErrorComponents
 import commons.i18n.I18nComponents
 import commons.web.RouteProvider
@@ -18,7 +18,6 @@ import akka.http.scaladsl.server.Directives.pathPrefix
 import akka.http.scaladsl.server.Route
 import cats.instances.FutureInstances
 import com.softwaremill.macwire.{wire, wireSet}
-import slick.dbio.DBIO
 
 trait AppComponents
     extends PureConfigComponents
@@ -42,8 +41,6 @@ trait AppComponents
   lazy val realWorldProperties: RealWorldProperties = configSource
     .at("realworld")
     .loadOrThrow[RealWorldProperties]
-
-  lazy val initRequired: Set[DbInitRequired[DBIO]] = wireSet[DbInitRequired[DBIO]]
 
   private[config] lazy val routeProviders         = wireSet[RouteProvider]
   private[config] lazy val compositeRouteProvider = wire[CompositeRouteProvider]

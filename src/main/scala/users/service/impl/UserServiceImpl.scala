@@ -3,9 +3,9 @@ package users.service.impl
 
 import commons.auth.service.TokenService
 import commons.db.DbInterpreter
-import commons.errors.model.{CredentialsException, NotFoundException, RealWorldError}
-import commons.model.ModelId
-import users.model.{NewUser, UpdateUser, UserWithToken}
+import commons.errors.model.{SecurityException, NotFoundException, RealWorldError}
+import commons.model.Email
+import users.model.{NewUser, UpdateUser, UserWithToken, Username}
 import users.repository.UserRepository
 import users.service.{PasswordHashService, UserFactory, UserService}
 
@@ -24,11 +24,11 @@ class UserServiceImpl[F[_]: Monad, DB[_]: Monad](
 )(implicit executionContext: ExecutionContext)
     extends UserService[F] {
 
-  def authenticateUser(email: String, password: String): F[Either[CredentialsException, UserWithToken]] = {
+  def authenticateUser(email: Email, password: String): F[Either[SecurityException, UserWithToken]] = {
     val unitOfWork = OptionT(userRepository.findByEmail(email))
       .filter(passwordHash.verifyForUser(password))
       .map(tokenService.generateNewTokenForUser)
-      .toRight(RealWorldError.InvalidCredentials.ex[CredentialsException])
+      .toRight(RealWorldError.InvalidCredentials.ex[SecurityException])
 
     dbInterpreter.execute(unitOfWork.value)
   }
@@ -41,20 +41,20 @@ class UserServiceImpl[F[_]: Monad, DB[_]: Monad](
     dbInterpreter.executeTransitionally(unitOfWork)
   }
 
-  def updateUser(id: ModelId, updateUser: UpdateUser): F[Either[NotFoundException, UserWithToken]] = {
-    val unitOfWork = OptionT(userRepository.findById(id))
+  def updateUser(username: Username, updateUser: UpdateUser): F[Either[NotFoundException, UserWithToken]] = {
+    val unitOfWork = OptionT(userRepository.findByUsername(username))
       .map(user => userFactory.createUpdatedUser(user, updateUser))
       .semiflatMap(userRepository.save)
       .map(tokenService.generateNewTokenForUser)
-      .toRight(RealWorldError.NotFound(id).ex[NotFoundException])
+      .toRight(RealWorldError.NotFound(username.value).ex[NotFoundException])
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
   }
 
-  def getUserById(id: ModelId): F[Either[NotFoundException, UserWithToken]] = {
-    val unitOfWork = OptionT(userRepository.findById(id))
+  def getUserByUsername(username: Username): F[Either[NotFoundException, UserWithToken]] = {
+    val unitOfWork = OptionT(userRepository.findByUsername(username))
       .map(tokenService.generateNewTokenForUser)
-      .toRight(RealWorldError.NotFound(id).ex[NotFoundException])
+      .toRight(RealWorldError.NotFound(username.value).ex[NotFoundException])
 
     dbInterpreter.execute(unitOfWork.value)
   }

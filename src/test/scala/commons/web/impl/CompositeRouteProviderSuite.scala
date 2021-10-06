@@ -42,7 +42,7 @@ class CompositeRouteProviderSuite extends RouteSpec with PropertiesFixture with 
 
   it should "handle CredentialsException" in {
     delegate.provideRoute returns get {
-      failWith(CredentialsException(Seq()))
+      failWith(SecurityException(Seq()))
     }
 
     Get() ~> `Accept-Language`(Language(locale.getLanguage)) ~> compositeRouteProvider.provideRoute ~> check {
