@@ -32,7 +32,8 @@ class ArticleServiceImpl[F[_]: Monad, DB[_]: Monad](
     val unitOfWork = for {
       article <- getBySlugInternal(slug)
       _       <- checkAccessRights(article)
-      updated <- EitherT.right[RealWorldException](articleRepository.save(articleFactory.createUpdated(article, params)))
+      updated <-
+        EitherT.right[RealWorldException](articleRepository.save(articleFactory.createUpdated(article, params)))
     } yield updated
 
     dbInterpreter.executeTransitionally(unitOfWork.value)
